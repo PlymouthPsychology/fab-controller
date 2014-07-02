@@ -1,0 +1,160 @@
+<html>
+<head>
+    <title></title>
+
+    <link href="bootstrap-combined.min.css" rel="stylesheet">
+    <script src="jquery.min.js"></script>
+    <script type="text/javascript" src="socket.js"></script>
+    <script type="text/javascript" src="knockout-3.1.0.js"></script>
+    <script type="text/javascript" src="knockout.mapping-latest.js"></script>
+
+    <style>
+    textarea
+    {
+        width:100%;
+    }
+
+    .console {
+            border-bottom: 1px solid grey;
+            border-top: 1px solid grey;
+            overflow: scroll;
+            height: 200px;
+            margin-bottom:2em;
+    }
+    </style>
+
+    <script type="text/javascript" charset="utf-8">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        $( document ).ready(function() {
+
+            // see http://stackoverflow.com/questions/7704268/formatting-rules-for-numbers-in-knockoutjs
+            ko.bindingHandlers.numericText = {
+                update: function(element, valueAccessor, allBindingsAccessor) {
+                   var value = ko.utils.unwrapObservable(valueAccessor()),
+                       precision = ko.utils.unwrapObservable(allBindingsAccessor().precision) || ko.bindingHandlers.numericText.defaultPrecision,
+                       formattedValue = value.toFixed(precision);
+                    ko.bindingHandlers.text.update(element, function() { return formattedValue; });
+                },
+                defaultPrecision: 2
+            };
+
+            //setup the model with empty data
+            var viewModel = ko.mapping.fromJS({'target_R': 0, 'smooth_R': 0, 'target_L': 0, 'smooth_L': 0});
+
+            ko.applyBindings(viewModel);
+
+            socket.on('update_dash', function(msg) {
+                ko.mapping.fromJSON(msg['data'], {}, viewModel);
+            });
+
+            socket.on('connect', function() {
+                socket.emit('my event', {data: 'I\'m connected!'});
+                logme("Connected")
+            });
+
+            var logme = function(msg){
+                $('#log tr:first').before('<tr><td>' +msg+'</td></tr>');
+            }
+
+            socket.on('log', function(msg) {
+                logme(msg)
+            });
+
+
+
+            // Click handlers
+            $(".stopbutton").click(function(){
+                socket.emit('stopall', {data: "Stop everything please"});
+            });
+
+            $(".clearlogbutton").click(function(){
+                // $('#log').empty();
+                socket.emit('clear_log', {});
+            });
+
+            $(".runbutton").click(function(){
+                socket.emit('newprog', {data: $('#prog').val()});
+            });
+        });
+
+
+    </script>
+
+</head>
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="span12">
+                <hr>
+                <h1>The pain machine</h1>
+                <hr>
+            </div>
+        </div>
+        <div class="row">
+            <div class="span2">
+                <h3>Controls</h3>
+                <p><a class="btn btn-large btn-danger stopbutton">Stop Crushing</a></p>
+
+                <hr>
+                <p><a target="new" class="btn" href="/log/">Open full log</a></p>
+                <p><a class="btn btn-warning clearlogbutton">Clear detailed log file</a></p>
+
+            </div>
+
+            <div class="span4">
+                <h3>Program</h3>
+                <textarea id="prog" class="textarea" cols=100 rows=10>
+[
+[5,2,3],
+[5,4,5]
+]
+                </textarea>
+                <p><a class="btn btn-success runbutton">Run program</a>
+
+                <div class="small">
+                    The format of a program is a list of blocks in the format:
+                    <code>[delay, left_target, right_target]</code>
+                </div>
+            </div>
+
+            <div class="span4">
+            <h3>Status</h3>
+
+            <table class="table">
+                <tr>
+                    <th>Hand</th><th>Sensor*</th><th>Target</th>
+                </tr>
+                <tr>
+                    <td>Left</td><td data-bind="numericText: smooth_L"></td><td data-bind="numericText: target_L"></td>
+                </tr>
+                <tr>
+                    <td>Right</td><td data-bind="numericText: smooth_R"></td><td data-bind="numericText: target_R"></td>
+                </tr>
+                <tr>
+                    <td colspan=3></td>
+                </tr>
+            </table>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="span10">
+                <hr>
+                <h3>Console</h3>
+                <div class="console">
+                <table class="table" id="log">
+                  <tbody>
+                    <tr><td></td></tr>
+                  </tbody>
+                </table>
+                </div>
+            </div>
+        </div>
+    <script src="bootstrap.min.js"></script>
+</body>
+</html>
+
+
