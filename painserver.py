@@ -2,7 +2,7 @@ from functools import partial
 import os
 import random
 import csv
-from tempfile import SpooledTemporaryFile
+from tempfile import TemporaryFile
 from datetime import datetime
 from collections import namedtuple, deque
 import json
@@ -222,7 +222,7 @@ run_right = partial(run_motor, 'right')
 
 def makefreshlog():
     # is this a problem? will we kill the disk eventually... it is a temp file tho...
-    app.logfile = SpooledTemporaryFile(mode="wab", max_size=3145728)  # 3mb before rolling to disk
+    app.logfile = TemporaryFile(mode="r+")
     app.logfile.write("target_L,target_R,smooth_L,smooth_R,timestamp\n")
 
 

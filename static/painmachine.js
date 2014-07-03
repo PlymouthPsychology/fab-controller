@@ -18,10 +18,6 @@ $( document ).ready(function() {
     );
     ko.applyBindings(PainDashboardModel);
 
-    socket.on('update_dash', function(msg) {
-        ko.mapping.fromJSON(msg['data'], {}, PainDashboardModel);
-    });
-
     socket.on('connect', function() {
         logme("Client connected.")
         $('#appwrapper').fadeTo(1, 1)
@@ -54,8 +50,15 @@ $( document ).ready(function() {
         socket.emit('set_manual', {left:left, right:right});
     };
 
-    $( "#leftslider" ).slider({slide: setManual, change: setManual});
-    $( "#rightslider" ).slider({slide: setManual, change: setManual});
+    $( "#leftslider" ).slider({slide: setManual, stop: setManual});
+    $( "#rightslider" ).slider({slide: setManual, stop: setManual});
+
+    socket.on('update_dash', function(msg) {
+        ko.mapping.fromJSON(msg['data'], {}, PainDashboardModel);
+        $("#leftslider").slider("value", PainDashboardModel.target_L());
+        $("#rightslider").slider("value", PainDashboardModel.target_R());
+    });
+
 
     // Click handlers
     $(".stopbutton").click(function(){

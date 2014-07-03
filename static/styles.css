@@ -15,3 +15,13 @@ textarea
 .sliderbox { margin: 10px;}
 
 .logtable {font-size: 10pt; line-spacing:10pt;}
+
+
+.btn-xlarge {
+    padding: 24px 32px;
+    font-size: 32px;
+    line-height: normal;
+    -webkit-border-radius: 8px;
+       -moz-border-radius: 8px;
+            border-radius: 8px;
+    }

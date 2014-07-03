@@ -10,6 +10,7 @@
     <script type="text/javascript" src="knockout-3.1.0.js"></script>
     <script type="text/javascript" src="knockout.mapping-latest.js"></script>
     <script src="bootstrap.min.js"></script>
+    <script src="underscore.js"></script>
     <script type="text/javascript" src="painmachine.js"></script>
 </head>
 
@@ -24,7 +25,7 @@
         </div>
         <div class="row">
             <div class="span12">
-                <center><a class="btn btn-large btn-danger stopbutton">Stop Crushing</a></center>
+                <center><button class="btn btn-xlarge btn-danger stopbutton" data-bind="enable: target_L() > 0 | target_R() > 0">Stop Crushing</button></center>
                 <hr>
             </div>
 
@@ -55,7 +56,9 @@
 ]
                         </textarea>
 
-                        <p><a class="btn btn-success runbutton">Run program</a>
+                        <p>
+                            <button class="btn btn-success runbutton" data-bind="enable: remaining() === null">Run program</button>
+
                             <a href="#" class="btn" data-toggle="modal" data-target="#myModal">Help</a>
                         </p>
                         <hr>
