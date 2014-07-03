@@ -93,18 +93,13 @@
             </div>
         </div>
         <div class="row">
-            <div class="span2">
-                <h3>Controls</h3>
-                <p><a class="btn btn-large btn-danger stopbutton">Stop Crushing</a></p>
-
+            <div class="span12">
+                <center><a class="btn btn-large btn-danger stopbutton">Stop Crushing</a></center>
                 <hr>
-                <p><a target="new" class="btn" href="/log/">Open full log</a></p>
-                <p><a class="btn btn-warning clearlogbutton">Clear detailed log file</a></p>
-
             </div>
 
             <div class="span4">
-                <h3>Program</h3>
+                <h3>Define a program</h3>
                 <textarea id="prog" class="textarea" cols=100 rows=10>
 [
 [5,2,3],
@@ -138,12 +133,8 @@
             </table>
             </div>
 
-        </div>
-
-        <div class="row">
-            <div class="span10">
-                <hr>
-                <h3>Console</h3>
+            <div class="span4">
+                <h3>Log</h3>
                 <div class="console">
                 <table class="table" id="log">
                   <tbody>
@@ -151,8 +142,14 @@
                   </tbody>
                 </table>
                 </div>
+                <a target="new" class="btn btn-mini" href="/log/">Open full log</a>
+                <a class="btn btn-mini btn-warning clearlogbutton">Clear detailed log file</a>
             </div>
+
+
         </div>
+
+
     <script src="bootstrap.min.js"></script>
 </body>
 </html>
