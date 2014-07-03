@@ -52,51 +52,39 @@ app.blocks = deque()
 
 
 
-@socketio.on('clear_log')
-def clear_log(message):
-    makefreshlog()
-    emit('log', "Logfile cleared.", broadcast=True)
+# HELPER FUNCTIONS
 
-
-@socketio.on('blockchange')
-def echo_socket(message):
-    while True:
-        send(message, broadcast=True)
-
-
-@socketio.on('stopall')
-def stopall(json):
-    stopall()
-    emit('log', "Stopping", broadcast=True)
 
 def stopall():
     [i.kill() for i in app.blocks]
     app.blocks.clear()
     _set_block_targets(0, 0)
-    app.targets.update({'left': 0, 'right': 0, "timestamp": datetime.now()})
 
 
 def _set_block_targets(left, right):
     """Function used by spawn_later to set target forces."""
     d = {'left': left, 'right': right, "timestamp": datetime.now()}
     app.targets.update({'left': left, 'right': right, "timestamp": datetime.now()})
-    socketio.emit('log', "Setting L={}, R={}".format(left, right))
+    socketio.emit('actionlog', "Setting L={}, R={}".format(left, right))
 
 
-@socketio.on('newprog')
-def newprog(jsondata):
-
-    # do some checking of prog here
+def _validate_json_program(jsondata):
     istriple = lambda i: len(i)==3
     try:
         prog = json.loads(jsondata['data'])
+        # do some checking of prog here
         assert sum(map(istriple, prog))==len(prog), "Program not made of triples."
+        return prog
+
     except Exception, e:
         emit('log', "Program error: " + str(e), broadcast=True)
-        return
+        return False
 
-    emit('log', "Starting new program", broadcast=True)
+def _log_action(msg):
+    socketio.emit('actionlog', msg)
+    app.logfile.write(str(msg) + "\n")
 
+def _schedule_program_for_execution(prog):
     # clear everything from the queue
     stopall()
 
@@ -105,9 +93,39 @@ def newprog(jsondata):
     for duration, left, right in prog:
         app.blocks.append(gevent.spawn_later(cumtime, _set_block_targets, *(left, right)))
         cumtime = cumtime + duration
-
+    print(cumtime)
     # make sure we end up back at a target of zero
     app.blocks.append(gevent.spawn_later(cumtime, _set_block_targets, *(0, 0)))
+    app.blocks.append(gevent.spawn_later(cumtime, _log_action, *("Program complete",)))
+
+
+
+
+# WEBSOCKET ROUTES
+
+@socketio.on('clear_log')
+def clear_log(message):
+    makefreshlog()
+    emit('log', "Logfile cleared.", broadcast=True)
+
+@socketio.on('log')
+def log_actions(message):
+    _log_action(str(message))
+
+@socketio.on('stopall')
+def stop_everything(json):
+    stopall()
+
+
+@socketio.on('new_program')
+def run_program_from_json(jsondata):
+    prog = _validate_json_program(jsondata)
+    if prog:
+        emit('log', "Starting new program", broadcast=True)
+        _schedule_program_for_execution(prog)
+
+
+# REGULAR HTTP ROUTES
 
 @app.route('/<path:path>')
 def static_proxy(path):
@@ -119,31 +137,6 @@ def download_log():
     app.logfile.seek(0)
     out = app.logfile.readlines()
     return Response(out, mimetype='text/event-stream')
-
-
-def run_blocks(prog, methods=['GET']):
-    """A generator function to run a specific program of blocks.
-    Yields a series of strings describing the progress of the program.
-
-    Programs are lists of Blocks - a namedtuple consisting of a duration
-    and a left and right target value.
-
-    TODO - this function should only really accept POST or PUT requests because browsers might cache or repeat GETs
-    """
-
-    yield "Starting program\n"
-    app.timer = 0
-    for duration, left, right in prog:
-        app.targets.update({'left': left, 'right': right, "timestamp": datetime.now()})
-        infostring = "Setting to: L={}, R={} for {} seconds\n".format(left, right, duration)
-        socketio.send(infostring)
-        yield infostring
-        gevent.sleep(duration)
-
-    stopall()
-    yield "Program complete; resetting target forces to zero."
-
-
 
 
 # BACKGROUND TASKS/HARDWARE CONTROL CODE IS BELOW
