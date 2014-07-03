@@ -21,5 +21,5 @@ To run:
     python painserver.py
 
 
-Then open [http://127.0.0.1:5000/index.html](http://127.0.0.1:5000/index.html):
+Then open [http://127.0.0.1:5000/index.html](http://127.0.0.1:5000/index.html) in a reasonable browser (not tested in IE, and certainly won't work in an old IE).
 
