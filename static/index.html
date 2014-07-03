@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container" id="appwrapper">
         <div class="row">
             <div class="span12">
                 <hr>
@@ -28,106 +28,105 @@
                 <hr>
             </div>
 
-            <div class="span4">
-                <h4>Define a program
-                    <a href="#" class="btn btn-mini" data-toggle="modal" data-target="#myModal">?</a>
-                </h4>
-                <textarea id="prog" class="textarea" cols=100 rows=10>
-[
-    [1,2,3],
-    {"duration": 2, "l":2, "r": 7}
-]
-                </textarea>
-                <p><a class="btn btn-success runbutton">Run program</a>
+            <div class="span6">
+                <h4>Controls</h4>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                  <li class="active"><a href="#manual" role="tab" data-toggle="tab">Manual</a></li>
+                  <li><a href="#program" role="tab" data-toggle="tab">Programmed</a></li>
+                </ul>
 
-
-                <!-- Button trigger modal -->
-
-
-                <!-- Modal -->
-                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Program syntax</h4>
-                      </div>
-                      <div class="modal-body">
-                        The format of a program is a list of blocks in the format:
-
-                        <p><code>[duration, left-target-force, right-target-force]</code></p>
-
-                        <p>or</p>
-
-                        <p><code>{"duration": 2, "l":2, "r": 7}</code></p>
-                        <p>If you want to be explicit.</p>
-
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                      </div>
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="manual">
+                        <h6>Manual control</h6>
+                        <h6>Left</h6>
+                        <div id="leftslider" class="sliderbox" ></div>
+                        <h6>Right</h6>
+                        <div class="sliderbox" id="rightslider"></div>
+                        <hr>
                     </div>
-                  </div>
+
+                    <div class="tab-pane" id="program">
+                        <textarea id="prog" class="textarea" cols=100 rows=10>
+[
+[1,2,3],
+{"duration": 2, "l":2, "r": 7}
+]
+                        </textarea>
+
+                        <p><a class="btn btn-success runbutton">Run program</a>
+                            <a href="#" class="btn" data-toggle="modal" data-target="#myModal">Help</a>
+                        </p>
+                        <hr>
+
+                        <!-- Button trigger modal -->
+                        <!-- Modal -->
+                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                <h4 class="modal-title" id="myModalLabel">Program syntax</h4>
+                              </div>
+                              <div class="modal-body">
+                                The format of a program is a list of blocks in the format:
+                                <p><code>[duration, left-target-force, right-target-force]</code></p>
+                                <p>or</p>
+                                <p><code>{"duration": 2, "l":2, "r": 7}</code></p>
+                                <p>If you want to be explicit.</p>
+
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                              </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+            </div>
+            </div>
 
+
+            <div class="span3">
+                <h4>Status</h4>
+                <table class="table">
+                    <tr>
+                        <th>Hand</th><th>Sensor*</th><th>Target</th>
+                    </tr>
+                    <tr>
+                        <td>Left</td><td data-bind="numericText: smooth_L"></td><td data-bind="numericText: target_L"></td>
+                    </tr>
+                    <tr>
+                        <td>Right</td><td data-bind="numericText: smooth_R"></td><td data-bind="numericText: target_R"></td>
+                    </tr>
+                    <tr>
+                        <td colspan=3></td>
+                    </tr>
+                </table>
+
+
+                <h5 data-bind="visible: remaining() != null">Program time remaining:</h5>
+                <h1 data-bind="text: remaining">time</h1>
+
+                <small>* Smoothed readings displayed, not raw sensor output.</small>
 
             </div>
 
-            <div class="span4">
-            <h4>Status</h4>
-
-            <table class="table">
-                <tr>
-                    <th>Hand</th><th>Sensor*</th><th>Target</th>
-                </tr>
-                <tr>
-                    <td>Left</td><td data-bind="numericText: smooth_L"></td><td data-bind="numericText: target_L"></td>
-                </tr>
-                <tr>
-                    <td>Right</td><td data-bind="numericText: smooth_R"></td><td data-bind="numericText: target_R"></td>
-                </tr>
-                <tr>
-                    <td colspan=3></td>
-                </tr>
-            </table>
-
-            <small>* Smoothed readings displayed here, not raw sensor output.</small>
-            </div>
-
-            <div class="span4">
+            <div class="span3">
                 <h4>Log</h4>
                 <div class="console">
-                <table class="table" id="log">
-                  <tbody>
-                    <tr><td></td></tr>
-                  </tbody>
-                </table>
+                    <table class="table logtable table-condensed table-striped" id="log">
+                      <tbody>
+                        <tr><td></td></tr>
+                      </tbody>
+                    </table>
                 </div>
                 <a target="new" class="btn btn-mini" href="/log/">Open full log</a>
                 <a class="btn btn-mini btn-warning clearlogbutton">Clear detailed log file</a>
             </div>
-
-
-        <div class="span12">
-            <hr>
-            <h4>Manual control</h4>
-        </div>
-
-            <div class="span6">
-            <h6>Left</h6>
-            <div id="leftslider" class="sliderbox" ></div>
-            </div>
-            <div class="span6">
-            <h6>Right</h6>
-            <div class="sliderbox" id="rightslider"></div>
-            </div>
-
-        </div>
-
-
-
-        <hr>
-
+    </div>
 </body>
 </html>
 

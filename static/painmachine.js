@@ -13,7 +13,9 @@ $( document ).ready(function() {
     };
 
     //setup the knockout view model with empty data
-    var PainDashboardModel = ko.mapping.fromJS({'target_R': 0, 'smooth_R': 0, 'target_L': 0, 'smooth_L': 0});
+    var PainDashboardModel = ko.mapping.fromJS(
+        {'target_R': 0, 'smooth_R': 0, 'target_L': 0, 'smooth_L': 0, 'remaining': null }
+    );
     ko.applyBindings(PainDashboardModel);
 
     socket.on('update_dash', function(msg) {
@@ -22,7 +24,16 @@ $( document ).ready(function() {
 
     socket.on('connect', function() {
         logme("Client connected.")
+        $('#appwrapper').fadeTo(1, 1)
         add_to_console("Client connected.")
+    });
+
+    socket.on('disconnect', function() {
+        $('#appwrapper').fadeTo(1, .2)
+    });
+
+    socket.on('programme_countdown', function(msg) {
+        add_to_console(msg.remaining)
     });
 
     var add_to_console = function(msg){
@@ -45,7 +56,6 @@ $( document ).ready(function() {
 
     $( "#leftslider" ).slider({slide: setManual, change: setManual});
     $( "#rightslider" ).slider({slide: setManual, change: setManual});
-
 
     // Click handlers
     $(".stopbutton").click(function(){

@@ -9,7 +9,7 @@ import json
 import gevent
 from gevent.pywsgi import WSGIServer
 import gevent.monkey
-from flask import Flask, Response
+from flask import Flask, Response, redirect
 from flask.ext.socketio import SocketIO, send, emit
 gevent.monkey.patch_all()
 
@@ -32,7 +32,6 @@ MOTORS = {
 }
 
 
-
 # Flask allows us to define urls and functions for the web interface
 app = Flask(__name__, )
 app.debug = True
@@ -44,13 +43,13 @@ socketio = SocketIO(app)
 # Specify some 'global' variables
 app.targets = {'left': 0, 'right': 0, 'timestamp': datetime.now()}
 
-# use a deque for the raw sensor readings for speed, store the last 100
-app.measurements = {'left': deque(maxlen=100), 'right': deque(maxlen=100)}
+# use a deque for the raw sensor readings for speed, store the last 50
+app.measurements = {'left': deque(maxlen=50), 'right': deque(maxlen=50)}
 app.smoothed = {'left': 0, 'right': 0}
 
 app.blocks = deque()
 
-
+app.programme_countdown = None
 
 # HELPER FUNCTIONS
 
@@ -59,6 +58,7 @@ def stopall():
     [i.kill() for i in app.blocks]
     app.blocks.clear()
     _set_block_targets(0, 0)
+    app.programme_countdown = None
 
 
 def _set_block_targets(left, right):
@@ -67,10 +67,12 @@ def _set_block_targets(left, right):
     app.targets.update({'left': left, 'right': right, "timestamp": datetime.now()})
     socketio.emit('actionlog', "Setting L={}, R={}".format(left, right))
 
+
 Block = namedtuple('Block', ['duration', 'l', 'r'])
 
+
 def _validate_json_program(jsondata):
-    istriple = lambda i: len(i)==3
+    istriple = lambda i: len(i) == 3
     try:
         prog = json.loads(jsondata['data'])
         mkblock = lambda i: isinstance(i, dict) and Block(**i) or Block(*i)
@@ -81,9 +83,11 @@ def _validate_json_program(jsondata):
         emit('actionlog', "Program error: " + str(e), broadcast=True)
         return False
 
+
 def _log_action(msg):
     socketio.emit('actionlog', msg)
     app.logfile.write(str(msg) + "\n")
+
 
 def _schedule_program_for_execution(prog):
     # clear everything from the queue
@@ -95,15 +99,13 @@ def _schedule_program_for_execution(prog):
         app.blocks.append(gevent.spawn_later(cumtime, _set_block_targets, *(block.l, block.r)))
         cumtime = cumtime + block.duration
 
+    app.programme_countdown = cumtime
     # make sure we end up back at a target of zero
     app.blocks.append(gevent.spawn_later(cumtime, _set_block_targets, *(0, 0)))
     app.blocks.append(gevent.spawn_later(cumtime, _log_action, *("Program complete",)))
 
 
-
-
 # WEBSOCKET ROUTES
-
 @socketio.on('clear_log')
 def clear_log(message):
     makefreshlog()
@@ -118,6 +120,7 @@ def set_manual(forces):
 @socketio.on('log')
 def log_actions(message):
     _log_action(str(message))
+
 
 @socketio.on('stopall')
 def stop_everything(json):
@@ -134,10 +137,17 @@ def run_program_from_json(jsondata):
 
 # REGULAR HTTP ROUTES
 
+
+@app.route('/')
+def hello():
+    return redirect("/index.html", code=302)
+
+
 @app.route('/<path:path>')
 def static_proxy(path):
     # send_static_file will guess the correct MIME type
     return app.send_static_file(path)
+
 
 @app.route('/log/', methods=['GET'])
 def download_log():
@@ -147,6 +157,20 @@ def download_log():
 
 
 # BACKGROUND TASKS/HARDWARE CONTROL CODE IS BELOW
+
+def programme_countdown():
+    while True:
+        if app.programme_countdown is not None:
+            socketio.emit('countdown', {'remaining': app.programme_countdown})
+
+            if app.programme_countdown == 0:
+                app.programme_countdown = None
+
+            if app.programme_countdown > 0:
+                app.programme_countdown = app.programme_countdown - 1
+
+        gevent.sleep(1)
+
 
 def poll_sensors():
     """Check the sensor readings and update app state."""
@@ -166,13 +190,14 @@ def smooth_current_sensor_values(func=sum):
 
 digitalWrite = lambda pin, val: None
 
+
 def _set_direction(motor, direction):
     digitalWrite(MOTORS[motor]['direction'], direction)
 
 
 def run_motor(motor):
     steppin = MOTORS[motor]['step']
-    dirpin =  MOTORS[motor]['direction']
+    dirpin = MOTORS[motor]['direction']
 
     while True:
         # XXX TODO THIS IS NOT FINISHED
@@ -221,11 +246,13 @@ def _dashdata():
         'target_R': app.targets['right'],
         'smooth_L': app.smoothed['left'],
         'smooth_R': app.smoothed['right'],
+        'remaining': app.programme_countdown,
     })
+
 
 def update_dash():
     while 1:
-        socketio.emit('update_dash', {'data': _dashdata() })
+        socketio.emit('update_dash', {'data': _dashdata()})
         gevent.sleep(DASHBOARD_UPDATE_INTERVAL)
 
 # THIS PART JOINS ALL THE KEY FUNCTIONS INTO THE COOPERATIVE EVENT LOOP
@@ -241,6 +268,6 @@ if __name__ == '__main__':
         gevent.spawn(run_left),
         gevent.spawn(run_right),
         gevent.spawn(update_dash),
+        gevent.spawn(programme_countdown),
         socketio.run(app)
     ])
-
