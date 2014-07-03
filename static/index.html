@@ -2,11 +2,14 @@
 <head>
     <title>The pain machine.</title>
     <link href="bootstrap-combined.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="jquery-ui.css">
     <link href="styles.css" rel="stylesheet">
     <script src="jquery.min.js"></script>
+    <script src="jquery-ui.js"></script>
     <script type="text/javascript" src="socket.js"></script>
     <script type="text/javascript" src="knockout-3.1.0.js"></script>
     <script type="text/javascript" src="knockout.mapping-latest.js"></script>
+    <script src="bootstrap.min.js"></script>
     <script type="text/javascript" src="painmachine.js"></script>
 </head>
 
@@ -26,20 +29,48 @@
             </div>
 
             <div class="span4">
-                <h4>Define a program</h4>
+                <h4>Define a program
+                    <a href="#" class="btn btn-mini" data-toggle="modal" data-target="#myModal">?</a>
+                </h4>
                 <textarea id="prog" class="textarea" cols=100 rows=10>
 [
-[1,2,3],
-[1,4,5],
-[1,10,50]
+    [1,2,3],
+    {"duration": 2, "l":2, "r": 7}
 ]
                 </textarea>
                 <p><a class="btn btn-success runbutton">Run program</a>
 
-                <div class="small">
-                    The format of a program is a list of blocks in the format:
-                    <code>[delay, left_target, right_target]</code>
+
+                <!-- Button trigger modal -->
+
+
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Program syntax</h4>
+                      </div>
+                      <div class="modal-body">
+                        The format of a program is a list of blocks in the format:
+
+                        <p><code>[duration, left-target-force, right-target-force]</code></p>
+
+                        <p>or</p>
+
+                        <p><code>{"duration": 2, "l":2, "r": 7}</code></p>
+                        <p>If you want to be explicit.</p>
+
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
+
             </div>
 
             <div class="span4">
@@ -77,10 +108,26 @@
             </div>
 
 
+        <div class="span12">
+            <hr>
+            <h4>Manual control</h4>
+        </div>
+
+            <div class="span6">
+            <h6>Left</h6>
+            <div id="leftslider" class="sliderbox" ></div>
+            </div>
+            <div class="span6">
+            <h6>Right</h6>
+            <div class="sliderbox" id="rightslider"></div>
+            </div>
+
         </div>
 
 
-    <script src="bootstrap.min.js"></script>
+
+        <hr>
+
 </body>
 </html>
 

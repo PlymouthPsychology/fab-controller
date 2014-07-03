@@ -1,7 +1,6 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
 $( document ).ready(function() {
-
     // see http://stackoverflow.com/questions/7704268/formatting-rules-for-numbers-in-knockoutjs
     ko.bindingHandlers.numericText = {
         update: function(element, valueAccessor, allBindingsAccessor) {
@@ -10,7 +9,7 @@ $( document ).ready(function() {
                formattedValue = value.toFixed(precision);
             ko.bindingHandlers.text.update(element, function() { return formattedValue; });
         },
-        defaultPrecision: 2
+        defaultPrecision: 0
     };
 
     //setup the knockout view model with empty data
@@ -38,6 +37,14 @@ $( document ).ready(function() {
         add_to_console(msg)
     });
 
+    setManual = function(){
+        left = $('#leftslider').slider( "value" )
+        right = $('#rightslider').slider( "value" )
+        socket.emit('set_manual', {left:left, right:right});
+    };
+
+    $( "#leftslider" ).slider({slide: setManual, change: setManual});
+    $( "#rightslider" ).slider({slide: setManual, change: setManual});
 
 
     // Click handlers
@@ -59,4 +66,6 @@ $( document ).ready(function() {
         add_to_console("!Run program.")
         socket.emit('new_program', {data: $('#prog').val()});
     });
+
+
 });

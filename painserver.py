@@ -67,17 +67,18 @@ def _set_block_targets(left, right):
     app.targets.update({'left': left, 'right': right, "timestamp": datetime.now()})
     socketio.emit('actionlog', "Setting L={}, R={}".format(left, right))
 
+Block = namedtuple('Block', ['duration', 'l', 'r'])
 
 def _validate_json_program(jsondata):
     istriple = lambda i: len(i)==3
     try:
         prog = json.loads(jsondata['data'])
-        # do some checking of prog here
-        assert sum(map(istriple, prog))==len(prog), "Program not made of triples."
+        mkblock = lambda i: isinstance(i, dict) and Block(**i) or Block(*i)
+        prog = [mkblock(i) for i in prog]
         return prog
 
     except Exception, e:
-        emit('log', "Program error: " + str(e), broadcast=True)
+        emit('actionlog', "Program error: " + str(e), broadcast=True)
         return False
 
 def _log_action(msg):
@@ -90,10 +91,10 @@ def _schedule_program_for_execution(prog):
 
     # work through the program, spawning future targets
     cumtime = 0
-    for duration, left, right in prog:
-        app.blocks.append(gevent.spawn_later(cumtime, _set_block_targets, *(left, right)))
-        cumtime = cumtime + duration
-    print(cumtime)
+    for block in prog:
+        app.blocks.append(gevent.spawn_later(cumtime, _set_block_targets, *(block.l, block.r)))
+        cumtime = cumtime + block.duration
+
     # make sure we end up back at a target of zero
     app.blocks.append(gevent.spawn_later(cumtime, _set_block_targets, *(0, 0)))
     app.blocks.append(gevent.spawn_later(cumtime, _log_action, *("Program complete",)))
@@ -107,6 +108,12 @@ def _schedule_program_for_execution(prog):
 def clear_log(message):
     makefreshlog()
     emit('log', "Logfile cleared.", broadcast=True)
+
+
+@socketio.on('set_manual')
+def set_manual(forces):
+    _set_block_targets(forces['left'], forces['right'])
+
 
 @socketio.on('log')
 def log_actions(message):
