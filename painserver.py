@@ -182,9 +182,9 @@ def poll_sensors():
         gevent.sleep(SENSOR_POLL_INTERVAL)
 
 
-_tmp = [1/math.log(i+2) for i in range(SMOOTHING_WINDOW)]
-SMOOTHING_CURVE = list(reversed([i/max(_tmp) for i in _tmp]))
 
+_tmp = [1/math.sqrt(i+2) for i in range(SMOOTHING_WINDOW)]
+SMOOTHING_CURVE = list(reversed([i/max(_tmp) for i in _tmp]))
 smoother = lambda x: sum([i*j for i, j in zip(x, SMOOTHING_CURVE)])/len(x)
 
 def smooth_current_sensor_values(func=smoother):
@@ -235,7 +235,7 @@ def run_motor(hand):
 
             _step_motor(hand)
 
-        delay = (1 / math.log(abs(delta)+2)) / 500
+        delay = (1 / math.sqrt(abs(delta)+2)) / 500
         app.motor_speed[hand] = delay
         gevent.sleep(min([.1, delay]))
 

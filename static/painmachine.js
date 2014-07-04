@@ -33,7 +33,6 @@ $( document ).ready(function() {
 
     // fade interface on connect and disconnect to indicate status
     socket.on('connect', function() {
-        logme("Client connected.")
         $('#appwrapper').fadeTo(1, 1)
         add_to_console("Client connected.")
     });
@@ -45,10 +44,6 @@ $( document ).ready(function() {
 
     var add_to_console = function(msg){
         $('#log tr:first').before('<tr><td>' +msg+'</td></tr>');
-    }
-
-    var logme = function(msg){
-        socket.emit('actionlog', {data: msg});
     }
 
     socket.on('actionlog', function(msg) {
@@ -72,7 +67,7 @@ $( document ).ready(function() {
     _setafewconsolemessages = _.throttle(function(){add_to_console("! Setting forces manually.");}, 1000);
 
     // also throttle this to limit line and log noise
-    var setManual = _.throttle(function(){
+    var setManual = _.throttle(function(event, ui){
         left = $('#leftslider').slider( "value" )
         right = $('#rightslider').slider( "value" )
         socket.emit('set_manual', {left:left, right:right});
@@ -127,7 +122,6 @@ $( document ).ready(function() {
 
 
     $(".runbutton").click(function(){
-        logme("!Run program.")
         add_to_console("! Run program.")
         socket.emit('new_program', {data: $('#prog').val()});
     });

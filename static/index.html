@@ -54,8 +54,8 @@
                     <div class="tab-pane" id="program">
                         <textarea id="prog" class="textarea" cols=100 rows=10>
 [
-[1,2,3],
-{"duration": 2, "l":2, "r": 7}
+[5,20,30],
+[10,25,35]
 ]
                         </textarea>
 
@@ -99,23 +99,20 @@
                 <h4>Status</h4>
                 <table class="table">
                     <tr>
-                        <th>Hand</th><th>Sensor*</th><th>Target</th><th width=15%></th>
+                        <th>Hand</th><th>Sensor*</th><th>Target</th>
+                    </tr>
+                    <tr data-bind="style: { color: Math.abs(target_L() - smooth_L()) > 2 ? 'red' : 'green' }">
+                        <td><span>Left</span></td>
+                        <td data-bind="numericText: smooth_L"></td>
+                        <td data-bind="numericText: target_L"></td>
+                    </tr>
+                    <tr data-bind="style: { color: Math.abs(target_R() - smooth_R()) > 2 ? 'red' : 'green' }">
+                        <td><span>Right</span></td>
+                        <td data-bind="numericText: smooth_R"></td>
+                        <td data-bind="numericText: target_R"></td>
                     </tr>
                     <tr>
-                        <td>Left</td><td data-bind="numericText: smooth_L"></td><td data-bind="numericText: target_L"></td>
-                        <td>
-                            <span data-bind="visible: Math.abs(target_L() - smooth_L()) > 2 ">!</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Right</td>
-                        <td data-bind="numericText: smooth_R"></td><td data-bind="numericText: target_R"></td>
-                        <td>
-                            <span data-bind="visible: Math.abs(target_R() - smooth_R()) > 2 ">!</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan=4></td>
+                        <td colspan=3></td>
                     </tr>
                 </table>
 
