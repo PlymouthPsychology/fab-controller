@@ -28,7 +28,7 @@
         </div>
         <div class="row">
             <div class="span12">
-                <center><button class="btn btn-xlarge btn-danger stopbutton" data-bind="enable: target_L() > 0 | target_R() > 0">Stop Crushing</button></center>
+                <center><button class="btn btn-xlarge btn-danger stopbutton" data-bind="enable: target_L() > 0 | target_R() > 0">Stop</button></center>
                 <hr>
             </div>
 
@@ -99,16 +99,23 @@
                 <h4>Status</h4>
                 <table class="table">
                     <tr>
-                        <th>Hand</th><th>Sensor*</th><th>Target</th>
+                        <th>Hand</th><th>Sensor*</th><th>Target</th><th width=15%></th>
                     </tr>
                     <tr>
                         <td>Left</td><td data-bind="numericText: smooth_L"></td><td data-bind="numericText: target_L"></td>
+                        <td>
+                            <span data-bind="visible: Math.abs(target_L() - smooth_L()) > 2 ">!</span>
+                        </td>
                     </tr>
                     <tr>
-                        <td>Right</td><td data-bind="numericText: smooth_R"></td><td data-bind="numericText: target_R"></td>
+                        <td>Right</td>
+                        <td data-bind="numericText: smooth_R"></td><td data-bind="numericText: target_R"></td>
+                        <td>
+                            <span data-bind="visible: Math.abs(target_R() - smooth_R()) > 2 ">!</span>
+                        </td>
                     </tr>
                     <tr>
-                        <td colspan=3></td>
+                        <td colspan=4></td>
                     </tr>
                 </table>
 

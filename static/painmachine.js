@@ -7,9 +7,9 @@ var detailedLog = []
 
 $( document ).ready(function() {
 
-    window.onbeforeunload = function() {
-      return "Are you sure you want to navigate away? This will delete all logged data for this session.";
-    }
+    // window.onbeforeunload = function() {
+    //   return "Are you sure you want to navigate away? This will delete all logged data for this session.";
+    // }
 
     // see http://stackoverflow.com/questions/7704268/formatting-rules-for-numbers-in-knockoutjs
     ko.bindingHandlers.numericText = {
@@ -19,7 +19,7 @@ $( document ).ready(function() {
                formattedValue = value.toFixed(precision);
             ko.bindingHandlers.text.update(element, function() { return formattedValue; });
         },
-        defaultPrecision: 1
+        defaultPrecision: 0
     };
 
     //setup the knockout view model with empty data - this is to allow declarative
@@ -77,7 +77,7 @@ $( document ).ready(function() {
         right = $('#rightslider').slider( "value" )
         socket.emit('set_manual', {left:left, right:right});
         _setafewconsolemessages();
-    }, 150);
+    }, 100);
 
     // setup sliders for manual control
     $( "#leftslider" ).slider({slide: setManual, stop: setManual});
