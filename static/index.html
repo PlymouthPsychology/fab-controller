@@ -112,6 +112,11 @@
                     </tr>
                 </table>
 
+                <p>true forces: <span data-bind="numericText: true_L"></span>/<span data-bind="numericText: true_R"></span></p>
+
+                <p>motor speeds: <span data-bind="numericText: motor_speed_L"></span>/<span data-bind="numericText: motor_speed_R"></span></p>
+
+                <hr>
 
                 <h5 data-bind="visible: remaining() != null">Program time remaining:</h5>
                 <h1 data-bind="text: remaining"></h1>

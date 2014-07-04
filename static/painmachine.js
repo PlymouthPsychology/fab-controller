@@ -1,4 +1,8 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+// this is the client side log structure which gets exported to csv from within the browser
+// we don't keep logs on the pi because it might get too big if the machine is left on and do
+// nasty things
 var detailedLog = []
 
 $( document ).ready(function() {
@@ -15,17 +19,19 @@ $( document ).ready(function() {
                formattedValue = value.toFixed(precision);
             ko.bindingHandlers.text.update(element, function() { return formattedValue; });
         },
-        defaultPrecision: 0
+        defaultPrecision: 1
     };
 
     //setup the knockout view model with empty data - this is to allow declarative
     //data bindings from json which comes in to html elements in the page
     //the first command sets up the model bindings from dummy json.
     var PainDashboardModel = ko.mapping.fromJS(
-        {'target_R': 0, 'smooth_R': 0, 'target_L': 0, 'smooth_L': 0, 'remaining': null }
+        {'target_R': 0, 'smooth_R': 0, 'target_L': 0, 'smooth_L': 0, 'remaining': null,
+        'motor_speed_L': 0, 'motor_speed_R': 0, 'true_L':0, 'true_R':0 }
     );
     ko.applyBindings(PainDashboardModel);
 
+    // fade interface on connect and disconnect to indicate status
     socket.on('connect', function() {
         logme("Client connected.")
         $('#appwrapper').fadeTo(1, 1)
@@ -35,6 +41,7 @@ $( document ).ready(function() {
     socket.on('disconnect', function() {
         $('#appwrapper').fadeTo(1, .2)
     });
+
 
     var add_to_console = function(msg){
         $('#log tr:first').before('<tr><td>' +msg+'</td></tr>');
@@ -49,27 +56,35 @@ $( document ).ready(function() {
     });
 
 
+    // show how many lines long the log is. Throttle to avoid annoyance in UI
     _updateloglength = _.throttle(function(){
         $('#loglength').html(detailedLog.length);
     }, 5000);
 
+    // append to log when mesages recieved
     socket.on('log', function(msg) {
         detailedLog.push(msg);
         _updateloglength()
     });
 
 
-    _setafewconsolemessages = _.throttle(function(){add_to_console("!Setting forces manually.");}, 1000);
-    var setManual = function(){
+    // throttle this because on manual dragging it otherwise slows down
+    _setafewconsolemessages = _.throttle(function(){add_to_console("! Setting forces manually.");}, 1000);
+
+    // also throttle this to limit line and log noise
+    var setManual = _.throttle(function(){
         left = $('#leftslider').slider( "value" )
         right = $('#rightslider').slider( "value" )
         socket.emit('set_manual', {left:left, right:right});
         _setafewconsolemessages();
-    };
+    }, 150);
 
+    // setup sliders for manual control
     $( "#leftslider" ).slider({slide: setManual, stop: setManual});
     $( "#rightslider" ).slider({slide: setManual, stop: setManual});
 
+    // apply json to knockout model and update sliders manually because they
+    // don't have a knockout binding yet
     socket.on('update_dash', function(msg) {
         ko.mapping.fromJSON(msg['data'], {}, PainDashboardModel);
         $("#leftslider").slider("value", PainDashboardModel.target_L());
@@ -77,10 +92,11 @@ $( document ).ready(function() {
     });
 
 
-    // Click handlers
+    // CLICK HANDLERS
+
+
     $(".stopbutton").click(function(){
         add_to_console("!Stop everything")
-        logme("!Stop everything")
         socket.emit('stopall', {});
     });
 
@@ -88,25 +104,31 @@ $( document ).ready(function() {
         if (confirm("Really delete all log data?") == true) {
             detailedLog = []
                     $('#loglength').html(detailedLog.length);
-                    add_to_console("!Clear logfile.")
+                    add_to_console("! Clearing logfile.")
         }
     });
 
-    var getlog = function(){return detailedLog}
 
+    // function for this because otherwise value of log bound at document ready
+    // time which means we lose all the data added subsequently
+    var getlog = function(){return detailedLog}
+    // use external lib to save data as csv, and to a file
+    // might need a fairly recent browser
+    // note in safari can't force a download - will have to press cmd-S
     $(".downloadlogbutton").click(function(){
         saveAs(
               new Blob(
                   [csv = CSV.objectToCsv(getlog())]
                 , {type: "text/plain;charset=utf-8"}
             )
-            , "document.xhtml"
+            , "painmachinelog.csv"
         );
     });
 
+
     $(".runbutton").click(function(){
         logme("!Run program.")
-        add_to_console("!Run program.")
+        add_to_console("! Run program.")
         socket.emit('new_program', {data: $('#prog').val()});
     });
 

@@ -1,5 +1,6 @@
 from functools import partial
 import os
+import math
 import random
 import csv
 from tempfile import TemporaryFile
@@ -15,15 +16,14 @@ gevent.monkey.patch_all()
 
 
 LOG_INTERVAL = 1  # seconds
-MOTOR_INTERVAL = .01
-SENSOR_POLL_INTERVAL = .1
+SENSOR_POLL_INTERVAL = .005  # too cpu intensive if less than this?
 SENSOR_SMOOTHED_CALC_INTERVAL = .2
 DASHBOARD_UPDATE_INTERVAL = .1
 
 
 # specify where CW is high or low when running motors
-UP = 0
-DOWN = 1
+UP = 1
+DOWN = -1
 
 #specify the motor pins
 MOTORS = {
@@ -44,16 +44,24 @@ socketio = SocketIO(app)
 app.targets = {'left': 0, 'right': 0, 'timestamp': datetime.now()}
 
 # use a deque for the raw sensor readings for speed, store the last 50
-app.measurements = {'left': deque(maxlen=50), 'right': deque(maxlen=50)}
+SMOOTHING_WINDOW = 60
+app.measurements = {'left': deque(maxlen=SMOOTHING_WINDOW), 'right': deque(maxlen=SMOOTHING_WINDOW)}
 app.smoothed = {'left': 0, 'right': 0}
 
 app.blocks = deque()
 
 app.programme_countdown = None
 
+
+ALLOWABLE_DISCREPANCY = .2
+
+
+# to fake sensor data
+app.true_force = {'left': 0, 'right': 0}
+app.motor_speed = {'left': 0, 'right': 0}
+
+
 # HELPER FUNCTIONS
-
-
 def stopall():
     [i.kill() for i in app.blocks]
     app.blocks.clear()
@@ -66,7 +74,9 @@ def _set_block_targets(left, right):
     """Function used by spawn_later to set target forces."""
     d = {'left': left, 'right': right, "timestamp": datetime.now()}
     app.targets.update({'left': left, 'right': right, "timestamp": datetime.now()})
-    socketio.emit('log', {'message': "Setting L={}, R={}".format(left, right)})
+    msg = "Setting L={}, R={}".format(left, right)
+    socketio.emit('log', {'message': msg})
+    socketio.emit('actionlog', msg)
 
 
 Block = namedtuple('Block', ['duration', 'l', 'r'])
@@ -93,7 +103,6 @@ def _validate_json_program(jsondata):
 def _log_action(msg):
     socketio.emit('actionlog', msg)
     socketio.emit('log', {'message': msg})
-    app.logfile.write(str(msg) + "\n")
 
 
 def _schedule_program_for_execution(prog):
@@ -147,9 +156,7 @@ def static_proxy(path):
     return app.send_static_file(path)
 
 
-
 # BACKGROUND TASKS/HARDWARE CONTROL CODE IS BELOW
-
 def programme_countdown():
     while True:
         if app.programme_countdown is not None:
@@ -168,29 +175,40 @@ def poll_sensors():
     """Check the sensor readings and update app state."""
     while True:
         # TODO fix this to get real measures from GPIO
-        app.measurements['left'].append(random.random())
-        app.measurements['right'].append(random.random())
-
+        app.measurements['left'].append(app.true_force['left'] + random.random()*.2)
+        app.measurements['right'].append(app.true_force['right'] + random.random()*.2)
         gevent.sleep(SENSOR_POLL_INTERVAL)
 
 
 def smooth_current_sensor_values(func=sum):
     """Calculate the current sensor readings, perhaps using smoothing function."""
     while True:
-        app.smoothed.update({'left': func(app.measurements['left']), 'right': func(app.measurements['right']), })
+        app.smoothed.update({
+            'left': func(app.measurements['left'])/SMOOTHING_WINDOW,
+            'right': func(app.measurements['right'])/SMOOTHING_WINDOW,
+        })
         gevent.sleep(SENSOR_SMOOTHED_CALC_INTERVAL)
 
 digitalWrite = lambda pin, val: None
 
 
-def _set_direction(motor, direction):
-    digitalWrite(MOTORS[motor]['direction'], direction)
+def _step_motor(hand):
+    digitalWrite(MOTORS[hand]['step'], 1)
+
+    # fake the true forces
+    if MOTORS[hand]['direction'] == DOWN:
+        app.true_force[hand] = app.true_force[hand] - .1
+    else:
+        app.true_force[hand] = app.true_force[hand] + .1
 
 
-def run_motor(motor):
-    steppin = MOTORS[motor]['step']
-    dirpin = MOTORS[motor]['direction']
 
+def _set_direction(hand, direction):
+    digitalWrite(MOTORS[hand]['direction'], direction)
+    MOTORS[hand]['direction'] = direction
+
+
+def run_motor(hand):
     while True:
         # XXX TODO THIS IS NOT FINISHED
         # delay is the inverse of the difference between target and current
@@ -199,13 +217,20 @@ def run_motor(motor):
         # might also not want to step if delay is < SOMEVALUE
         # at this point we could also change direction if needed
 
-        digitalWrite(steppin, 1)
-        delay = 1 / (app.targets[motor] - app.smoothed[motor]) + 1
-        if delay > 0:
-            digitalWrite(dirpin, UP)
-        else:
-            digitalWrite(dirpin, DOWN)
-        gevent.sleep(delay)
+        # larger delta means we need more force pressing down
+        delta =  app.targets[hand] - app.smoothed[hand]
+        if abs(delta) > ALLOWABLE_DISCREPANCY:
+            # decide which direciton
+            if delta > 0:
+                _set_direction(hand, UP)
+            else:
+                _set_direction(hand, DOWN)
+
+            _step_motor(hand)
+
+        delay = (1/math.log(abs(delta)+1)) / 100
+        app.motor_speed[hand] = delay
+        gevent.sleep(min([.1, delay]))
 
 # make functions for L and R which can be joined independently to the event loop
 run_left = partial(run_motor, 'left')
@@ -214,12 +239,17 @@ run_right = partial(run_motor, 'right')
 
 def _build_log_entry():
     return {
-            'left_target': app.targets['left'],
-            'right_target': app.targets['right'],
-            'left_smoothed': app.smoothed['left'],
-            'right_smoothed': app.smoothed['right'],
-            'time': datetime.now().isoformat(),
-        }
+        'target_L': app.targets['left'],
+        'target_R': app.targets['right'],
+        'smooth_L': app.smoothed['left'],
+        'smooth_R': app.smoothed['right'],
+        'time': datetime.now().isoformat(),
+        'remaining': app.programme_countdown,
+        'true_L': app.true_force['left'],
+        'true_R': app.true_force['right'],
+        'motor_speed_L': app.motor_speed['left']*100,
+        'motor_speed_R': app.motor_speed['right']*100
+    }
 
 
 def log_data():
@@ -230,13 +260,7 @@ def log_data():
 
 
 def _dashdata():
-    return json.dumps({
-        'target_L': app.targets['left'],
-        'target_R': app.targets['right'],
-        'smooth_L': app.smoothed['left'],
-        'smooth_R': app.smoothed['right'],
-        'remaining': app.programme_countdown,
-    })
+    return json.dumps(_build_log_entry())
 
 
 def update_dash():
