@@ -59,13 +59,14 @@ def stopall():
     app.blocks.clear()
     _set_block_targets(0, 0)
     app.programme_countdown = None
+    socketio.emit('log', {'message': "Stopping"})
 
 
 def _set_block_targets(left, right):
     """Function used by spawn_later to set target forces."""
     d = {'left': left, 'right': right, "timestamp": datetime.now()}
     app.targets.update({'left': left, 'right': right, "timestamp": datetime.now()})
-    socketio.emit('actionlog', "Setting L={}, R={}".format(left, right))
+    socketio.emit('log', {'message': "Setting L={}, R={}".format(left, right)})
 
 
 Block = namedtuple('Block', ['duration', 'l', 'r'])
@@ -77,15 +78,21 @@ def _validate_json_program(jsondata):
         prog = json.loads(jsondata['data'])
         mkblock = lambda i: isinstance(i, dict) and Block(**i) or Block(*i)
         prog = [mkblock(i) for i in prog]
+        msg = "Program validated"
+        emit('actionlog', msg, broadcast=True)
+        socketio.emit('log', {'message': msg})
         return prog
 
     except Exception, e:
-        emit('actionlog', "Program error: " + str(e), broadcast=True)
+        msg = "Program error: " + str(e)
+        emit('actionlog', msg, broadcast=True)
+        socketio.emit('log', {'message': msg})
         return False
 
 
 def _log_action(msg):
     socketio.emit('actionlog', msg)
+    socketio.emit('log', {'message': msg})
     app.logfile.write(str(msg) + "\n")
 
 
@@ -103,13 +110,6 @@ def _schedule_program_for_execution(prog):
     # make sure we end up back at a target of zero
     app.blocks.append(gevent.spawn_later(cumtime, _set_block_targets, *(0, 0)))
     app.blocks.append(gevent.spawn_later(cumtime, _log_action, *("Program complete",)))
-
-
-# WEBSOCKET ROUTES
-@socketio.on('clear_log')
-def clear_log(message):
-    makefreshlog()
-    emit('log', "Logfile cleared.", broadcast=True)
 
 
 @socketio.on('set_manual')
@@ -131,12 +131,10 @@ def stop_everything(json):
 def run_program_from_json(jsondata):
     prog = _validate_json_program(jsondata)
     if prog:
-        emit('log', "Starting new program", broadcast=True)
         _schedule_program_for_execution(prog)
 
 
 # REGULAR HTTP ROUTES
-
 
 @app.route('/')
 def hello():
@@ -148,12 +146,6 @@ def static_proxy(path):
     # send_static_file will guess the correct MIME type
     return app.send_static_file(path)
 
-
-@app.route('/log/', methods=['GET'])
-def download_log():
-    app.logfile.seek(0)
-    out = app.logfile.readlines()
-    return Response(out, mimetype='text/event-stream')
 
 
 # BACKGROUND TASKS/HARDWARE CONTROL CODE IS BELOW
@@ -220,23 +212,20 @@ run_left = partial(run_motor, 'left')
 run_right = partial(run_motor, 'right')
 
 
-def makefreshlog():
-    # is this a problem? will we kill the disk eventually... it is a temp file tho...
-    app.logfile = TemporaryFile(mode="r+")
-    app.logfile.write("target_L,target_R,smooth_L,smooth_R,timestamp\n")
+def _build_log_entry():
+    return {
+            'left_target': app.targets['left'],
+            'right_target': app.targets['right'],
+            'left_smoothed': app.smoothed['left'],
+            'right_smoothed': app.smoothed['right'],
+            'time': datetime.now().isoformat(),
+        }
 
 
 def log_data():
     """Log every LOG_INTERVAL to a text file."""
-    while 1:
-        out = "{:8.3g},{:8.3g},{:8.3g},{:8.3g},{}\n".format(
-            app.targets['left'],
-            app.targets['right'],
-            app.smoothed['left'],
-            app.smoothed['right'],
-            datetime.now(),
-            )
-        app.logfile.write(out)
+    while True:
+        socketio.emit('log', _build_log_entry())
         gevent.sleep(LOG_INTERVAL)
 
 
@@ -259,7 +248,6 @@ def update_dash():
 
 if __name__ == '__main__':
     print("Running...")
-    makefreshlog()
 
     gevent.joinall([
         gevent.spawn(log_data),

@@ -1,4 +1,4 @@
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" >
 <head>
     <title>The pain machine.</title>
     <link href="bootstrap-combined.min.css" rel="stylesheet">
@@ -11,6 +11,9 @@
     <script type="text/javascript" src="knockout.mapping-latest.js"></script>
     <script src="bootstrap.min.js"></script>
     <script src="underscore.js"></script>
+    <script type="application/ecmascript" async="" src="Blob.js"></script>
+    <script type="application/ecmascript" async="" src="FileSaver.js"></script>
+    <script src="ucsv-1.2.0.min.js"></script>
     <script type="text/javascript" src="painmachine.js"></script>
 </head>
 
@@ -111,7 +114,7 @@
 
 
                 <h5 data-bind="visible: remaining() != null">Program time remaining:</h5>
-                <h1 data-bind="text: remaining">time</h1>
+                <h1 data-bind="text: remaining"></h1>
 
                 <small>* Smoothed readings displayed, not raw sensor output.</small>
 
@@ -126,8 +129,19 @@
                       </tbody>
                     </table>
                 </div>
-                <a target="new" class="btn btn-mini" href="/log/">Open full log</a>
-                <a class="btn btn-mini btn-warning clearlogbutton">Clear detailed log file</a>
+
+
+
+
+
+                <div class="well small">
+                        <p>
+                            <a class="downloadlogbutton btn btn-mini btn-primary" href="#">Download full log</a>
+
+                        <a class="btn btn-mini btn-warning clearlogbutton">Clear detailed log file</a>
+                    </p>
+                    Detailed log contains <span id="loglength">...</span> items.
+                </div>
             </div>
     </div>
 </body>
