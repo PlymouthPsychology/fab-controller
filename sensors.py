@@ -5,7 +5,7 @@ from client import app
 from fakeworld import sensor_noise, steps_from_top, pin_states
 from settings import *
 from utils import *
-
+from py_io import *
 
 def at_top_limit(hand):
     """XXX need to make this real and test a pin attached to microswitch"""

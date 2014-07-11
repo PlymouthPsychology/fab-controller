@@ -7,6 +7,7 @@ from sensors import at_top_limit
 from fakeworld import pin_states, steps_from_top
 from settings import *
 from utils import *
+from py_io import *
 
 
 def _get_direction(hand):
