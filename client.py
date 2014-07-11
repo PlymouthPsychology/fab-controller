@@ -12,7 +12,7 @@ socketio = SocketIO(app)
 
 from fakeworld import steps_from_top
 from motors import run_motors_to_top_stop
-from pins import *
+from settings import *
 
 # WEB SOCKET EVENT HANDLERS
 

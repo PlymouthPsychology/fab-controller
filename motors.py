@@ -5,7 +5,7 @@ from client import app
 from programs import set_block_targets
 from sensors import at_top_limit
 from fakeworld import pin_states, steps_from_top
-from pins import *
+from settings import *
 from utils import *
 
 

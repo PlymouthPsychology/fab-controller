@@ -3,7 +3,7 @@ import random
 import gevent
 from client import app
 from fakeworld import sensor_noise, steps_from_top, pin_states
-from pins import *
+from settings import *
 from utils import *
 
 
