@@ -27,14 +27,14 @@ $( document ).ready(function() {
     //the first command sets up the model bindings from dummy json.
     var PainDashboardModel = ko.mapping.fromJS(
         {'target_R': 0, 'smooth_R': 0, 'target_L': 0, 'smooth_L': 0, 'remaining': null,
-        'motor_speed_L': 0, 'motor_speed_R': 0, 'true_L':0, 'true_R':0 }
+         'true_L':0, 'true_R':0 }
     );
     ko.applyBindings(PainDashboardModel);
 
     // fade interface on connect and disconnect to indicate status
     socket.on('connect', function() {
-        $('#appwrapper').fadeTo(1, 1)
-        add_to_console("Client connected.")
+        $('#appwrapper').fadeTo(1, 1);
+        add_to_console("Client connected.");
     });
 
     socket.on('disconnect', function() {

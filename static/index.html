@@ -28,7 +28,7 @@
         </div>
         <div class="row">
             <div class="span12">
-                <center><button class="btn btn-xlarge btn-danger stopbutton" data-bind="enable: target_L() > 0 | target_R() > 0">Stop</button></center>
+                <center><button class="btn btn-xlarge btn-danger stopbutton" data-bind="enable: true_L() > 0 | true_R() > 0">Stop</button></center>
                 <hr>
             </div>
 
@@ -53,10 +53,9 @@
 
                     <div class="tab-pane" id="program">
                         <textarea id="prog" class="textarea" cols=100 rows=10>
-[
-[5,20,30],
-[10,25,35]
-]
+5,50,50
+5,70,75
+5,20,20
                         </textarea>
 
                         <p>
@@ -78,9 +77,8 @@
                               <div class="modal-body">
                                 The format of a program is a list of blocks in the format:
                                 <p><code>[duration, left-target-force, right-target-force]</code></p>
-                                <p>or</p>
-                                <p><code>{"duration": 2, "l":2, "r": 7}</code></p>
-                                <p>If you want to be explicit.</p>
+                                <p>or copy comma or space (or tab) separated numbers here in the same order</p>
+                                
 
                               </div>
                               <div class="modal-footer">
@@ -116,9 +114,7 @@
                     </tr>
                 </table>
 
-                <p>true forces: <span data-bind="numericText: true_L"></span>/<span data-bind="numericText: true_R"></span></p>
-
-                <p>motor speeds: <span data-bind="numericText: motor_speed_L"></span>/<span data-bind="numericText: motor_speed_R"></span></p>
+                <p>steps from top: <span data-bind="numericText: true_L"></span>/<span data-bind="numericText: true_R"></span></p>
 
                 <hr>
 
