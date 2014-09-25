@@ -1,7 +1,6 @@
 import gevent
 import math
 from functools import partial
-from client import app
 from programs import set_block_targets
 from sensors import at_top_limit
 from fakeworld import pin_states, steps_from_top
@@ -49,7 +48,7 @@ def run_motors_to_top_stop():
         _step_motor('left')
         _step_motor('right')
         gevent.sleep(0)
-    
+
 
 def run_motor_to_maintain_constant_force(hand):
     while True:
@@ -64,7 +63,7 @@ def run_motor_to_maintain_constant_force(hand):
                 _set_direction(hand, DOWN)
 
             gevent.spawn(_step_motor, *(hand,))
-        
+
         # longer pause between step as we get closer to target
         delay = adelta > 3 and .0005 or adelta > 1 and .005 or adelta > .1 and .05 or .2
         gevent.sleep(delay)

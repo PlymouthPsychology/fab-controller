@@ -23,3 +23,9 @@ To run:
 
 Then open [http://127.0.0.1:5000/](http://127.0.0.1:5000/) in a reasonable browser (not tested in IE, and certainly won't work in an old IE).
 
+
+
+
+sudo apt-get install python-setuptools
+sudo python get-pip.py
+sudo pip install -r requirements.txt

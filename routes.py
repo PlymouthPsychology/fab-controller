@@ -1,21 +1,19 @@
-import re
-from collections import namedtuple
-from datetime import datetime
+import json
 from flask import Flask, Response, redirect
 from flask.ext.socketio import SocketIO, send, emit
+import re
+from collections import namedtuple
+
+from datetime import datetime
 import gevent
-import json
 
-app = Flask(__name__, )
-app.debug = True
-socketio = SocketIO(app)
-
+from settings import *
 from fakeworld import steps_from_top
 from motors import run_motors_to_top_stop
-from settings import *
+
+
 
 # WEB SOCKET EVENT HANDLERS
-
 
 def log_action(msg):
     socketio.emit('actionlog', msg)
@@ -59,6 +57,7 @@ def static_proxy(path):
 
 
 
+## HELPERS
 def stopall():
     [i.kill() for i in app.blocks]
     app.blocks.clear()
@@ -66,7 +65,6 @@ def stopall():
     app.programme_countdown = None
     socketio.emit('log', {'message': "Stopping"})
     run_motors_to_top_stop()
-
 
 
 def schedule_program_for_execution(prog):
@@ -87,7 +85,7 @@ def schedule_program_for_execution(prog):
 
 def set_block_targets(left, right):
     """Function used by spawn_later to set target forces."""
-    d = {'left': left, 'right': right, "timestamp": datetime.now()}
+    d = {'left': left, 'right': right }
     app.targets.update({'left': left, 'right': right, "timestamp": datetime.now()})
     msg = "Setting L={}, R={}".format(left, right)
     socketio.emit('log', {'message': msg})
@@ -106,7 +104,7 @@ def validate_json_program(jsondata):
         lines = [re.split('\W+|[,]', i) for i in lines]
         print lines
         prog =  [map(float, i) for i in lines]
-        
+
     try:
         mkblock = lambda i: isinstance(i, dict) and Block(**i) or Block(*i)
         prog = [mkblock(i) for i in prog]
@@ -166,3 +164,5 @@ def programme_countdown():
                 app.programme_countdown = app.programme_countdown - 1
 
         gevent.sleep(1)
+
+

@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 from collections import namedtuple
-from client import socketio, app
 from flask.ext.socketio import emit
 import gevent
 
