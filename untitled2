@@ -1,0 +1,49 @@
+
+
+# # ### MAIN EVENT LOOP FUNCTIONS
+
+# def poll_sensors():
+#     """Check the sensor readings and update app state."""
+#     while True:
+#         w = app.weight_stream.next()
+#         app.measurements.left.append(w.left)
+#         app.measurements.right.append(w.right)
+#         gevent.sleep(SENSOR_POLL_INTERVAL)
+
+# def smooth_current_sensor_values(func=av):
+#     """Calculate the current sensor readings, perhaps using smoothing function."""
+#     while True:
+#         app.smoothed = Pair(
+#             func(app.measurements.left),
+#             func(app.measurements.right),
+#         )
+#         gevent.sleep(SENSOR_SMOOTHED_CALC_INTERVAL)
+
+
+# # SAFETY CUTOUT CALLBACKS
+
+# def mark_limit(channel):
+#     cur = GPIO.input(channel)
+#     print cur
+#     if cur:
+#         app.on_limit.update({channel:True})
+#     else:
+#         app.on_limit.update({channel:False})
+#     print app.on_limit
+
+
+# GPIO.add_event_detect(
+#     HIGH_LIMIT_PIN.left,
+#     GPIO.BOTH,
+#     callback=mark_limit,
+#     bouncetime=10)
+
+
+
+
+
+
+# # # THIS JOINS ALL THE KEY FUNCTIONS INTO THE CO-OPERATIVE EVENT LOOP
+# if __name__ == '__main__':
+
+#     print("Running...")

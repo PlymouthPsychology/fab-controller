@@ -15,6 +15,12 @@ To install:
     cd painmachine
     pip install -r requirements.txt
 
+    git clone https://github.com/WiringPi/WiringPi-Python.git
+    cd WiringPi-Python
+    git submodule update --init
+    sudo cp WiringPi/wiringPi/*.h /usr/include/  # headers not copied otherwise???
+    sudo python setup.py install
+
 
 To run:
 

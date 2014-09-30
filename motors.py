@@ -3,7 +3,6 @@ import math
 from functools import partial
 from programs import set_block_targets
 from sensors import at_top_limit
-from fakeworld import pin_states, steps_from_top
 from settings import *
 from utils import *
 from py_io import *
@@ -11,10 +10,6 @@ from py_io import *
 
 def _get_direction(hand):
     return digital_read(MOTOR_PINS[hand]['direction'])
-
-
-def _set_direction(hand, direction):
-    MOTOR_PINS[hand]['direction'] = direction
 
 
 def _calculate_increment(hand):

@@ -1,17 +1,12 @@
 import math
 import random
-import gevent
-from client import app
 from settings import *
-from py_io import weights
 
 
+av = lambda x: sum(x)/SMOOTHING_WINDOW
 
 
-
-
-# av = lambda x: sum(x)/SMOOTHING_WINDOW
-
+# more complex function probably not needed
 # # pre-calculate decay function weights to smooth sensor input
 # _tmp = [i**2 for i in range(SMOOTHING_WINDOW)]
 # SMOOTHING_CURVE = [scale_to_new_range(i, (min(_tmp), max(_tmp))) for i in _tmp]  # scale it back to 0..1

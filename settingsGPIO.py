@@ -9,17 +9,14 @@ HANDS = ['left', 'right']
 Pair = namedtuple('Pair', HANDS)
 
 
-# MOTOR PIN NUMBERS USING wiringpi pin numbering because wiringpi faster for read/write
-STEP_PIN = Pair(1, 4)
-DIRECTION_PIN = Pair(5, 6)
-
-# THESE ARE IN BCM numbering because we need GPIO to do the interrupts
+# MOTOR PIN NUMBERS USING GPIO.BCM numbering
+STEP_PIN = Pair(18, 23)
+DIRECTION_PIN = Pair(24, 25)
 HIGH_LIMIT_PIN = Pair(17, 22)
 KILL_PIN = 4
 
-
 # Delay between setting pin high and low when pulsing the stepper motors
-STEP_DELAY = .00025
+STEP_DELAY = .0001
 
 
 # specify where CW is high or low when running motors
@@ -43,7 +40,7 @@ MM_MAX_TRAVEL = 20
 MAX_STEPS = (MM_MAX_TRAVEL / MM_PER_REV) * STEPS_PER_REV
 
 
-ALLOWABLE_DISCREPANCY = 10  # delta between sensor reading and target which triggers a movement
+ALLOWABLE_DISCREPANCY = 5  # delta between sensor reading and target which triggers a movement
 
 
 # SENSOR SETTINGS
@@ -51,8 +48,7 @@ ALLOWABLE_DISCREPANCY = 10  # delta between sensor reading and target which trig
 # parameters for voltage to kg conversion
 # intercepts (alpha) and slopes (beta)
 # stored as pairs because sensor calibration may differ between components
-ALPHA = Pair(-451.9, -555)
-
+ALPHA = Pair(-451.9, -595)
 BETA = Pair(1121.427, 1149.319)
 
 
