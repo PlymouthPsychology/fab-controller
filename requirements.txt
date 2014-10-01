@@ -2,3 +2,4 @@ Flask==0.10.1
 clint==0.3.1
 gevent==1.0.1
 Flask-SocketIO==0.3.8
+git+https://github.com/WiringPi/WiringPi2-Python.git@6bb2ccff228f7b46eb9aaf624e8c4bb82277beb8#egg=wiringpi2

@@ -26,7 +26,7 @@ $( document ).ready(function() {
     //data bindings from json which comes in to html elements in the page
     //the first command sets up the model bindings from dummy json.
     var PainDashboardModel = ko.mapping.fromJS(
-        {'target_R': 0, 'smooth_R': 0, 'target_L': 0, 'smooth_L': 0, 'remaining': null,
+        {'target_R': 0, 'sensor_R': 0, 'target_L': 0, 'sensor_L': 0, 'remaining': null,
          'true_L':0, 'true_R':0 }
     );
     ko.applyBindings(PainDashboardModel);
@@ -72,11 +72,11 @@ $( document ).ready(function() {
         right = $('#rightslider').slider( "value" )
         socket.emit('set_manual', {left:left, right:right});
         _setafewconsolemessages();
-    }, 100);
+    }, 10);
 
     // setup sliders for manual control
-    $( "#leftslider" ).slider({slide: setManual, stop: setManual});
-    $( "#rightslider" ).slider({slide: setManual, stop: setManual});
+    $( "#leftslider" ).slider({min:0, max:2000, slide: setManual, stop: setManual});
+    $( "#rightslider" ).slider({min:0, max:2000, slide: setManual, stop: setManual});
 
     // apply json to knockout model and update sliders manually because they
     // don't have a knockout binding yet
@@ -90,10 +90,20 @@ $( document ).ready(function() {
     // CLICK HANDLERS
 
 
-    $(".stopbutton").click(function(){
+    $("#stopbutton").click(function(){
         add_to_console("!Stop everything")
         socket.emit('stopall', {});
     });
+
+    $("#getsetbutton").click(function(){
+        add_to_console("Rest crushers on fingers")
+        socket.emit('restonfingers', {});
+    });
+
+    // $("#resetbutton").click(function(){
+    //     add_to_console("Reset")
+    //     socket.emit('bothgototop', {});
+    // });
 
     $(".clearlogbutton").click(function(){
         if (confirm("Really delete all log data?") == true) {

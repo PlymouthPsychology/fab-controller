@@ -8,19 +8,22 @@ HANDS = ['left', 'right']
 # Pairs are a structure used to store values on each hand
 Pair = namedtuple('Pair', HANDS)
 
+Block = namedtuple('Block', ['duration', 'grams']) # grams should be a pair
+
+WIRING_PULL_UP = 2
+WIRING_PULL_DOWN = 1
+WIRING_PULL_DEACTIVATE = 0
 
 # MOTOR PIN NUMBERS USING wiringpi pin numbering because wiringpi faster for read/write
 STEP_PIN = Pair(1, 4)
 DIRECTION_PIN = Pair(5, 6)
+HIGH_LIMIT_PIN = Pair(0, 3)
 
-# THESE ARE IN BCM numbering because we need GPIO to do the interrupts
-HIGH_LIMIT_PIN = Pair(17, 22)
-KILL_PIN = 4
+# KILL_PIN = 4
 
 
 # Delay between setting pin high and low when pulsing the stepper motors
-STEP_DELAY = .00025
-
+STEP_DELAY = .0001
 
 # specify where CW is high or low when running motors
 UP = 0
@@ -43,15 +46,14 @@ MM_MAX_TRAVEL = 20
 MAX_STEPS = (MM_MAX_TRAVEL / MM_PER_REV) * STEPS_PER_REV
 
 
-ALLOWABLE_DISCREPANCY = 10  # delta between sensor reading and target which triggers a movement
+ALLOWABLE_DISCREPANCY = 5  # delta between sensor reading and target which triggers a movement
 
 
 # SENSOR SETTINGS
 
 # parameters for voltage to kg conversion
-# intercepts (alpha) and slopes (beta)
+# slopes (beta)
 # stored as pairs because sensor calibration may differ between components
-ALPHA = Pair(-451.9, -555)
 
 BETA = Pair(1121.427, 1149.319)
 
@@ -63,16 +65,7 @@ SENSOR_CHANNEL_CODE = Pair(0x68, 0x69)
 SENSOR_SAMPLE_RATE = 12
 
 
-# How many values to store and smooth over
-SMOOTHING_WINDOW = 10
-
-# How often to poll the sensors themselves
-SENSOR_POLL_INTERVAL = .01  # too cpu intensive if less than this?
-
-# How often to calculate a new smoothed value
-SENSOR_SMOOTHED_CALC_INTERVAL = .1  # .04
-
-
 # CLIENT
 LOG_INTERVAL = 1  # seconds
 DASHBOARD_UPDATE_INTERVAL = .1
+SERVER_PORT = 2008

@@ -21,6 +21,11 @@ To install:
     sudo cp WiringPi/wiringPi/*.h /usr/include/  # headers not copied otherwise???
     sudo python setup.py install
 
+    cd ~/
+    git clone git://git.drogon.net/wiringPi
+    cd wiringPi
+    git pull origin
+    ./build
 
 To run:
 

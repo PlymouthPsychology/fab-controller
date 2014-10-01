@@ -11,6 +11,7 @@ gevent.monkey.patch_all()
 
 from settings import *
 from sensors import av
+from logging import *
 
 from flask import Flask
 from flask.ext.socketio import SocketIO, send, emit
@@ -27,8 +28,8 @@ app.programme_countdown = None
 
 
 from ABElectronics_ADCPi import ADCPi
-import RPi.GPIO as GPIO
-import wiringpi
+import wiringpi2 as wiringpi
+
 
 
 # Initialise connections to the pi ADC
@@ -36,11 +37,6 @@ app.ADC = ADCPi(SENSOR_CHANNEL_CODE.left, SENSOR_CHANNEL_CODE.right, SENSOR_SAMP
 
 # Register the board with wiringpi
 io = wiringpi.GPIO(wiringpi.GPIO.WPI_MODE_PINS)
-
-# Also register with GPIO so we can use interrupts
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(KILL_PIN, GPIO.IN)
-
 
 
 class Crusher(object):
@@ -54,7 +50,7 @@ class Crusher(object):
     alpha = None
     beta = None
 
-    def __init__(self, limit_top_pin, step_pin, direction_pin, sensor_channel, alpha, beta, name="crusher"):
+    def __init__(self, limit_top_pin, step_pin, direction_pin, sensor_channel, beta, name="crusher"):
 
         self.target = 0
         self.limit_top_pin = limit_top_pin
@@ -63,7 +59,6 @@ class Crusher(object):
         self.direction = UP
         self.direction_pin = direction_pin
         self.sensor_channel = sensor_channel
-        self.alpha = alpha
         self.beta = beta
 
         # setup motor pins with wiringpi for speed
@@ -71,9 +66,11 @@ class Crusher(object):
         io.pinMode(direction_pin, io.OUTPUT)
         io.digitalWrite(direction_pin, UP)
 
-        # setup switch pins with GPIO for interrupts
-        GPIO.setup(limit_top_pin, GPIO.IN)
+        # setup switch pins with pull up resistor
+        io.pinMode(limit_top_pin, io.INPUT)
+        io.pullUpDnControl(limit_top_pin, WIRING_PULL_UP)
 
+        # calculate the offset for volts to grams conversion
         corrected_alpha = - self.beta * self.volts()
         self.alpha = corrected_alpha
         print "Corrected alpha for ", self.name, corrected_alpha
@@ -87,7 +84,11 @@ class Crusher(object):
             self.direction = direction
 
     def at_top(self):
-        return GPIO.input(self.limit_top_pin)
+        return io.digitalRead(self.limit_top_pin)
+        # "Require 3 positive sensor readings."
+        # return all(
+        #     [io.digitalRead(self.limit_top_pin) for i in range(3)]
+        # )
 
     def go_to_top_and_init(self):
         print("Initialising step from top count")
@@ -97,6 +98,8 @@ class Crusher(object):
         while not self.at_top():
             self.pulse(force=True)
             gevent.sleep()
+        self.set_direction(DOWN)
+        self.pulse(1000, force=True)
         print self.name, "at top"
         self.steps_from_top = 0
 
@@ -107,12 +110,12 @@ class Crusher(object):
             if not force:
                 # don't go beyond MAX_STEPS from the top
                 if self.direction is DOWN and self.steps_from_top >= (MAX_STEPS - n):
-                    print "too low", self.steps_from_top, n
+                    # print self.name, "too low to step. Now at ", self.steps_from_top, "Need to step ", n
                     return
 
                 # don't go within 100 steps of the top
                 if self.direction is UP and self.steps_from_top < 10:
-                    print "too high", self.steps_from_top, n
+                    # print self.name, "too high to step. Now at ", self.steps_from_top, "Need to step ", n
                     return
 
             for i in range(n):
@@ -126,34 +129,27 @@ class Crusher(object):
             else:
                 self.steps_from_top += - n
 
-
-
     def volts(self):
         return self.adc.readVoltage(self.sensor_channel)
 
     def grams(self):
         """Convert using regression parameters in settings.
         Note parameters for each hand/sensor may differ."""
-        return self.alpha + self.beta * self.volts()
+        return max([0, int(self.alpha + self.beta * self.volts())])
+
 
     def update_direction(self, delta):
         # decide which direction
         d = delta > 0 and DOWN or UP
         self.set_direction(d)
 
-
-
     def track(self):
         """Pulse and change direction to track target weight."""
-        while True:
-            gevent.sleep(0)
-            delta = self.target - self.grams()
-            adelta = abs(delta)
-            if adelta > ALLOWABLE_DISCREPANCY:
-                print "moving", self.name, delta
-                npulses = max([1, int(math.log(adelta))])
-                gevent.spawn(self.pulse, npulses)
-                gevent.spawn(self.update_direction, delta)
+        delta = self.target - self.grams()
+        adelta = abs(delta)+1
+        if adelta > ALLOWABLE_DISCREPANCY:
+            npulses = lambda adelta: max([1, min([int(.001 * adelta + .001 * adelta**2 + .001 * adelta**3), 20])])
+            self.update_direction(delta)
+            self.pulse(npulses(adelta))
 
-            gevent.sleep()
 
