@@ -10,7 +10,6 @@ import gevent.monkey
 gevent.monkey.patch_all()
 
 from settings import *
-from sensors import av
 from logging import *
 
 from flask import Flask
