@@ -1,3 +1,7 @@
+# TODO
+
+- Calibration by marking with button when system at 2kg on scales?
+
 
 # The pain machine
 

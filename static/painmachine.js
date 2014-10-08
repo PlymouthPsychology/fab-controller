@@ -90,14 +90,26 @@ $( document ).ready(function() {
     // CLICK HANDLERS
 
 
+    $("#zerobutton").click(function(){
+        add_to_console("Zero'd sensors")
+        socket.emit('zero_sensor', {});
+    });
+
     $("#stopbutton").click(function(){
         add_to_console("!Stop everything")
         socket.emit('stopall', {});
+        socket.emit('lift_slightly', {});
+        socket.emit('lift_slightly', {});
     });
 
     $("#getsetbutton").click(function(){
         add_to_console("Rest crushers on fingers")
         socket.emit('restonfingers', {});
+    });
+
+    $("#lift_slightly_button").click(function(){
+        add_to_console("Lifting slightly")
+        socket.emit('lift_slightly', {});
     });
 
     // $("#resetbutton").click(function(){

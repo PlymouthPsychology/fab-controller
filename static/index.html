@@ -28,7 +28,7 @@
         </div>
         <div class="row">
             <div class="span12">
-                <center><button id="stopbutton" class="btn btn-xlarge btn-danger" data-bind="enable: true_L() > 0 | true_R() > 0">Stop</button>
+                <center><button id="stopbutton" class="btn btn-xlarge btn-danger" data-bind="enable: target_L() > 0 | target_R() > 0">Stop</button>
 
                 <button id="getsetbutton"  class="btn btn-xlarge ">Get Set</button>
 
@@ -143,15 +143,30 @@
 
 
 
-                <div class="well small">
+                <!-- <div class="well small">
                         <p>
                             <a class="downloadlogbutton btn btn-mini btn-primary" href="#">Download full log</a>
 
                         <a class="btn btn-mini btn-warning clearlogbutton">Clear detailed log file</a>
                     </p>
                     Detailed log contains <span id="loglength">...</span> items.
-                </div>
+                </div> -->
+
             </div>
+
+    <!-- Settings -->
+    <div class="row">
+        <div class="span12">
+            <hr>
+            <center>
+
+                <button id="zerobutton" class="btn btn-sm">Zero sensors</button>
+                <button id="lift_slightly_button" class="btn btn-sm">Lift slightly</button>
+
+                <hr>
+        </div>
+    </div>
+
     </div>
 </body>
 </html>
