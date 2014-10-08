@@ -15,5 +15,6 @@ def build_log_entry(app):
         'remaining': app.programme_countdown and int(app.programme_countdown) or None,
         'true_L': app.left.steps_from_top,
         'true_R': app.right.steps_from_top,
+        'logfile': app.logfilename,
     }
 

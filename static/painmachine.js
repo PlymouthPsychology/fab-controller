@@ -27,7 +27,7 @@ $( document ).ready(function() {
     //the first command sets up the model bindings from dummy json.
     var PainDashboardModel = ko.mapping.fromJS(
         {'target_R': 0, 'sensor_R': 0, 'target_L': 0, 'sensor_L': 0, 'remaining': null,
-         'true_L':0, 'true_R':0 }
+         'true_L':0, 'true_R':0, 'logfile': 'log.txt'}
     );
     ko.applyBindings(PainDashboardModel);
 
@@ -62,9 +62,8 @@ $( document ).ready(function() {
         _updateloglength()
     });
 
-
     // throttle this because on manual dragging it otherwise slows down
-    _setafewconsolemessages = _.throttle(function(){add_to_console("! Setting forces manually.");}, 1000);
+    _setafewconsolemessages = _.throttle(function(){add_to_console("Setting target manually.");}, 1000);
 
     // also throttle this to limit line and log noise
     var setManual = _.throttle(function(event, ui){
@@ -75,8 +74,8 @@ $( document ).ready(function() {
     }, 10);
 
     // setup sliders for manual control
-    $( "#leftslider" ).slider({min:0, max:2000, slide: setManual, stop: setManual});
-    $( "#rightslider" ).slider({min:0, max:2000, slide: setManual, stop: setManual});
+    $( "#leftslider" ).slider({min: 0, max: 2000, slide: setManual, stop: setManual});
+    $( "#rightslider" ).slider({min: 0, max: 2000, slide: setManual, stop: setManual});
 
     // apply json to knockout model and update sliders manually because they
     // don't have a knockout binding yet
@@ -89,6 +88,11 @@ $( document ).ready(function() {
 
     // CLICK HANDLERS
 
+
+    pulse = function(hand, direction, n){
+    socket.emit('manual_pulse', {hand: hand, direction: direction, n: n});
+        add_to_console("Manual pulses sent");
+    }
 
     $("#zerobutton").click(function(){
         add_to_console("Zero'd sensors");
@@ -123,10 +127,15 @@ $( document ).ready(function() {
         socket.emit('lift_slightly', {});
     });
 
-    // $("#resetbutton").click(function(){
-    //     add_to_console("Reset")
-    //     socket.emit('bothgototop', {});
-    // });
+    function updatelogfilename(){
+        socket.emit('set_logfile_name', {logfilename: $("#logfilename").val()});
+    }
+
+    $("#logfilename").blur(function(){
+        add_to_console("Updating logfile name")
+        updatelogfilename();
+    });
+
 
     $(".clearlogbutton").click(function(){
         if (confirm("Really delete all log data?") == true) {

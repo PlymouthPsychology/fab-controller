@@ -51,6 +51,10 @@
                         <td
                             data-bind="numericText: sensor_R, style: { color: Math.abs(target_R() - sensor_R()) > 15 ? 'red' : 'green' }"></td>
                     </tr>
+                    <tr>
+                        <td>Logfile</td>
+                        <td colspan=2>
+                            <input id="logfilename" data-bind="value: logfile()"/></td>
                     <!-- <tr>
                         <td>Steps from top</td>
                         <td data-bind="numericText: true_L"></td>
@@ -86,9 +90,11 @@
 
                     <div class="tab-pane" id="program">
                         <textarea id="prog" class="textarea" cols=100 rows=10>
-8,50,500
-10,500,600
-15,20,20
+5,50,50
+10,500,500
+5,650,550
+5,750,500
+10,100,100
                         </textarea>
 
                         <p>

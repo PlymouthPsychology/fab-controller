@@ -1,3 +1,4 @@
+import os
 import signal
 import sys
 from collections import deque
@@ -16,6 +17,7 @@ app.config['debug'] = False
 socketio = SocketIO(app)
 app.blocks = deque()
 app.programme_countdown = None
+app.logfilename = "log.txt"
 
 
 print "Acquiring the arduino board and starting iterator..."
@@ -70,6 +72,7 @@ while True:
 scale_range = lambda x, OldMin, OldMax, NewMin, NewMax: \
     (((x - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
 
+
 class Crusher(object):
     """Manages a finger crusher, including sensor, motor and limit switches."""
 
@@ -110,7 +113,7 @@ class Crusher(object):
 
         print "\n", self.name, "is at top limit switch."
         self.set_direction(DOWN)
-        self.pulse(1500)
+        self.pulse(REST_N_FROM_TOP)
         print self.name, "is ready"
         self.steps_from_top = 0
 
@@ -151,7 +154,8 @@ class Crusher(object):
 
     def zero_sensor(self):
         self.zero = self.analog_reading()
-        print "Setting zero point for", self.name, "to analog reading:{}".format(self.zero)
+        msg = "Setting zero point for {} to analog reading: {}".format(self.name, self.zero)
+        print msg
 
     def grams(self):
         """Scale using parameters in settings. Note parameters for each hand/sensor may differ."""
@@ -190,28 +194,54 @@ def set_manual(forces):
     l, r = (forces['left'], forces['right'])
     app.left.target = l
     app.right.target = r
-    print (l, r)
+    _log_session_data({'targets': Pair(l, r)})
 
 
 @socketio.on('new_program')
 def run_program_from_json(jsondata):
     prog = validate_json_program(jsondata)
     if prog:
-        print prog
+        _log_session_data({'programme': prog})
         schedule_program_for_execution(prog)
 
 
 @socketio.on('stopall')
 def stop_everything(x):
     stopall()
-    print "Stopping everything"
+
+
+@socketio.on('set_logfile_name')
+def set_logfile_name(data):
+    app.logfilename = data.get("logfilename", "log.txt")
+    print "Updated logfilename to ", app.logfilename
+
+
+def _log_session_data(data):
+    """Write a dictionary as a string to a line in the logfile."""
+    if not isinstance(data, dict):
+        data = {'message': data}
+
+    data.update({'timestamp': datetime.now()})
+    with open(os.path.join(LOGFILE_DIR, app.logfilename), "a") as f:
+        f.write(str(data) + "\n")
+    if data.get('message', None):
+        print data.get('message')
+        socketio.emit('log', data)
+    else:
+        print "Wrote to log: ", str(data)
+
+
+@socketio.on('log_session_data')
+def log_session_data(data):
+    """Socket handler to write to log from client."""
+    return _log_session_data(data)
 
 
 @socketio.on('restonfingers')
 def restonfingers(x):
     app.left.target = 20
     app.right.target = 20
-    print "Resting on fingers"
+    _log_session_data({'message': "Resting on fingers"})
 
 
 @socketio.on('zero_sensor')
@@ -223,10 +253,9 @@ def zero_sensors(x):
 
 @socketio.on('mark_twokg')
 def mark_twokg(data):
-    crusher =  getattr(app, data['hand'])
+    crusher = getattr(app, data['hand'])
     crusher.twokg = crusher.analog_reading()
     print "Set 2kg value for {} to {}".format(crusher.name, crusher.twokg)
-
 
 
 @socketio.on('lift_slightly')
@@ -238,76 +267,68 @@ def lift_slightly(x):
     print "Lifted both pistons slightly."
 
 
-def log_action(msg):
-    print msg
-    socketio.emit('log', {'message': msg})
+@socketio.on('manual_pulse')
+def manual_pulse(data):
+    print "Executing manual pulses", str(data)
+    crusher = getattr(app, data['hand'])
+    crusher.set_direction(MOVEMENT[data['direction'].lower()])
+    crusher.pulse(n=int(data['n']))
 
 
 def stopall():
+    _log_session_data({'message': "Stop button pressed."})
     [i.kill() for i in app.blocks]
     app.blocks.clear()
     set_block_targets(Pair(0, 0))
     app.programme_countdown = None
-    socketio.emit('log', {'message': "Stopping"})
 
 
 def validate_json_program(jsondata):
 
-    lines = [x for x in jsondata['data'].splitlines() if x.strip()]
-    lines = [x for x in lines if x[0] is not "#"]
-    lines = [re.split('\W+|[,]', i) for i in lines]
-    prog = [map(int, i) for i in lines]
-
     try:
-        mkblock = lambda i: Block(i[0], Pair(i[1], i[2]))
-        blocks = [mkblock(i) for i in prog]
-        msg = "Program validated"
-        print msg
-        # emit('actionlog', msg, broadcast=True)
-        # socketio.emit('log', {'message': msg})
-        print map(type, blocks)
-        return blocks
+        lines = [x for x in jsondata['data'].splitlines() if x.strip()]  # strip whitespace
+        lines = [x for x in lines if x[0] is not "#"]  # remove comments
+        lines = [re.split('\W+|[,]', i) for i in lines]  # split duration, left, right
+        prog_ints = [map(int, i) for i in lines]  # we need integers
+        return map(lambda x: Block(x[0], Pair(x[1], x[2])), prog_ints)  # return blocks
 
     except Exception, e:
         msg = "Program error: " + str(e)
         print msg
         emit('actionlog', msg, broadcast=True)
-        socketio.emit('log', {'message': msg})
         return False
 
 
 def schedule_program_for_execution(prog):
 
     stopall()  # clear everything already in the queue
+    prog = deque(prog)  # because we want to popleft on this
 
-    # work through the program, spawning functiosn which will set future target values
-    cumtime = 0
-    for block in prog:
-        app.blocks.append(gevent.spawn_later(cumtime, set_block_targets, *(block.grams, )))
-        cumtime += block.duration
+    def add_blocks_keeping_running_time(programme, blocks, cumtime):
+        """Recursive function to spawn a list of future blocks from a user program.
 
-    app.programme_countdown = cumtime  # se the countdown timer
+        Return tuple of the blocks and the total running time of the programme.
+        """
+        if not programme:
+            print "finished building blocks from prog"
+            blocks.append(gevent.spawn_later(cumtime, set_block_targets, Pair(0, 0)))
+            blocks.append(gevent.spawn_later(cumtime, _log_session_data, *({'message': "Program complete"})))
+            return (blocks, cumtime)
+        else:
+            block = programme.popleft()
+            blocks.append(gevent.spawn_later(cumtime, set_block_targets, *(block.grams, )))
+            return add_blocks_keeping_running_time(programme, blocks, cumtime + block.duration)
 
-    # make sure we return to a target of zero
-    app.blocks.append(gevent.spawn_later(cumtime, set_block_targets, Pair(0, 0)))
-    app.blocks.append(gevent.spawn_later(cumtime, log_action, *("Program complete",)))
+    app.blocks, app.programme_countdown = add_blocks_keeping_running_time(prog, deque(), 0)
+    print app.blocks, app.programme_countdown
 
 
 def set_block_targets(grams):
     """Function used by spawn_later to set target forces."""
 
-    app.left.target = grams.left
-    app.right.target = grams.right
-    msg = "Setting L={}, R={}".format(grams.left, grams.right)
-    socketio.emit('log', {'message': msg})
-    print(msg)
-
-
-def log_data():
-    """Log every LOG_INTERVAL to a text file."""
-    while True:
-        socketio.emit('log', _build_log_entry())
-        gevent.sleep(LOG_INTERVAL)
+    app.left.target, app.right.target = grams
+    msg = "Setting L={}, R={}".format(*grams)
+    _log_session_data({"targets": grams})
 
 
 def programme_countdown():
@@ -332,7 +353,18 @@ def tight():
     while 1:
         ENABLE_PISTON.left and app.left.track()
         ENABLE_PISTON.right and app.right.track()
-        gevent.sleep(.0001)
+        gevent.sleep(TIGHT_LOOP_INTERVAL)
+
+
+def log_sensors():
+    while 1:
+        if app.left.target > 0 or app.right.target > 0:
+            _log_session_data({
+                'measurement': Pair(app.left.grams(), app.right.grams()),
+                'targets': Pair(app.left.target, app.right.target),
+            })
+
+        gevent.sleep(LOG_INTERVAL)
 
 
 if __name__ == "__main__":
@@ -352,9 +384,11 @@ if __name__ == "__main__":
     )
 
     gevent.joinall([
+        # only run the piston if enabled in settings
         ENABLE_PISTON.left and gevent.spawn(app.left.go_to_top_and_init),
         ENABLE_PISTON.right and gevent.spawn(app.right.go_to_top_and_init),
         gevent.spawn(tight),
+        gevent.spawn(log_sensors),
         gevent.spawn(update_dash),
         gevent.spawn(programme_countdown),
         socketio.run(app, host="0.0.0.0", port=SERVER_PORT)
