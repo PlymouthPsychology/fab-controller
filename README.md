@@ -23,8 +23,3 @@ Then open [http://127.0.0.1:2008/](http://127.0.0.1:2008/) in a reasonable brows
 
 
 
-## TODO
-
-- Allow calibration by marking with button when system at 2kg on scales
-
-
