@@ -6,6 +6,8 @@ Block = namedtuple('Block', ['duration', 'grams'])  # grams should be a pair
 
 
 # FOR TWEAKING
+ENABLE_PISTON = Pair(True, False)  # e.g. only use left crusher for testing
+
 STEP_DELAY = .0004  # Delay between setting pin high and low when pulsing the stepper motors
 ALLOWABLE_DISCREPANCY = 20  # delta between sensor reading and target which triggers a movement
 TWO_KG = Pair(0.413, 0.443)  # sensor readings at 2kg load - these need to be measured!!!

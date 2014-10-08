@@ -322,8 +322,8 @@ def update_dash():
 
 def tight():
     while 1:
-        app.left.track()
-        # app.right.track() XXX
+        ENABLE_PISTON.left and app.left.track()
+        ENABLE_PISTON.right and app.right.track()
         gevent.sleep(.0001)
 
 
@@ -332,14 +332,11 @@ if __name__ == "__main__":
     # test the left machine
     print "Starting crusher instances:",
 
-    print "left",
     app.left = Crusher(
         live_pins['left']['sensor_pin'].read(),
         TWO_KG.left,
         "left"
     )
-
-    print "right",
     app.right = Crusher(
         live_pins['right']['sensor_pin'].read(),
         TWO_KG.right,
@@ -347,8 +344,8 @@ if __name__ == "__main__":
     )
 
     gevent.joinall([
-        gevent.spawn(app.left.go_to_top_and_init),
-        # gevent.spawn(app.right.go_to_top_and_init), XXX
+        ENABLE_PISTON.left and gevent.spawn(app.left.go_to_top_and_init),
+        ENABLE_PISTON.right and gevent.spawn(app.right.go_to_top_and_init),
         gevent.spawn(tight),
         gevent.spawn(update_dash),
         gevent.spawn(programme_countdown),
