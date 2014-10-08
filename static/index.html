@@ -20,24 +20,51 @@
 <body>
     <div class="container" id="appwrapper">
         <div class="row">
-            <div class="span12">
+            <div class="span4">
                 <hr>
                 <h1>The pain machine</h1>
+            </div>
+            <div class="span4">
                 <hr>
+                    <button id="getsetbutton"  class="btn btn-xlarge ">Get Set</button>
+                    <button id="stopbutton" class="btn btn-xlarge btn-danger" data-bind="enable: target_L() > 0 | target_R() > 0">Stop</button>
+             <h5 data-bind="visible: remaining() != null">Program time remaining: <span data-bind="text: remaining"></span></h5>
+            </div>
+
+            <div class="span4">
+                <hr>
+
+                <table class="table table-condensed">
+                    <tr>
+                        <th width="50%">Value</th><th width="25%">L</th><th width="25%">R</th>
+                    </tr>
+                    <tr>
+                        <td>Target</td>
+                        <td data-bind="numericText: target_L"></td>
+                        <td data-bind="numericText: target_R"></td>
+                    </tr>
+                    <tr>
+                        <td>Grams</td>
+                        <td
+                            data-bind="numericText: sensor_L, style: { color: Math.abs(target_L() - sensor_L()) > 15 ? 'red' : 'green' }"
+                            ></td>
+                        <td
+                            data-bind="numericText: sensor_R, style: { color: Math.abs(target_R() - sensor_R()) > 15 ? 'red' : 'green' }"></td>
+                    </tr>
+                    <!-- <tr>
+                        <td>Steps from top</td>
+                        <td data-bind="numericText: true_L"></td>
+                        <td data-bind="numericText: true_R"></td>
+                    </tr> -->
+                </table>
             </div>
         </div>
         <div class="row">
             <div class="span12">
-                <center><button id="stopbutton" class="btn btn-xlarge btn-danger" data-bind="enable: target_L() > 0 | target_R() > 0">Stop</button>
-
-                <button id="getsetbutton"  class="btn btn-xlarge ">Get Set</button>
-
-                <!-- <button id="resetbutton"  class="btn btn-xlarge ">Reset</button> -->
-
-                </center>
                 <hr>
             </div>
-
+        </div>
+        <div class="row">
             <div class="span6">
                 <h4>Controls</h4>
                 <!-- Nav tabs -->
@@ -99,37 +126,9 @@
             </div>
 
 
-            <div class="span3">
-                <h4>Status</h4>
-                <table class="table">
-                    <tr>
-                        <th>Hand</th><th>Sensor*</th><th>Target</th>
-                    </tr>
-                    <tr data-bind="style: { color: Math.abs(target_L() - sensor_L()) > 8 ? 'red' : 'green' }">
-                        <td><span>Left</span></td>
-                        <td data-bind="numericText: sensor_L"></td>
-                        <td data-bind="numericText: target_L"></td>
-                    </tr>
-                    <tr data-bind="style: { color: Math.abs(target_R() - sensor_R()) > 8 ? 'red' : 'green' }">
-                        <td><span>Right</span></td>
-                        <td data-bind="numericText: sensor_R"></td>
-                        <td data-bind="numericText: target_R"></td>
-                    </tr>
-                    <tr>
-                        <td colspan=3></td>
-                    </tr>
-                </table>
 
-                <p>steps from top: <span data-bind="numericText: true_L"></span>/<span data-bind="numericText: true_R"></span></p>
 
-                <hr>
-
-                <h5 data-bind="visible: remaining() != null">Program time remaining:</h5>
-                <h1 data-bind="text: remaining"></h1>
-
-            </div>
-
-            <div class="span3">
+            <div class="span6">
                 <h4>Log</h4>
                 <div class="console">
                     <table class="table logtable table-condensed table-striped" id="log">
@@ -160,8 +159,15 @@
             <hr>
             <center>
 
-                <button id="zerobutton" class="btn btn-sm">Zero sensors</button>
-                <button id="lift_slightly_button" class="btn btn-sm">Lift slightly</button>
+                <button id="zerobutton" class="btn btn-xs">Zero sensors</button>
+
+                <button id="left_2kg_button" class="btn btn-xs">Mark left @2kg</button>
+
+                <button id="right_2kg_button" class="btn btn-xs">Mark right @2kg</button>
+
+
+
+
 
                 <hr>
         </div>

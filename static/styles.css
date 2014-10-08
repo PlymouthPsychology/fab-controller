@@ -16,6 +16,9 @@ textarea
 
 .logtable {font-size: 10pt; line-spacing:10pt;}
 
+.table th {
+     border-top: none;
+ }
 
 .btn-xlarge {
     padding: 24px 32px;

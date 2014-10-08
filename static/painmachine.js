@@ -91,8 +91,19 @@ $( document ).ready(function() {
 
 
     $("#zerobutton").click(function(){
-        add_to_console("Zero'd sensors")
+        add_to_console("Zero'd sensors");
         socket.emit('zero_sensor', {});
+    });
+
+
+    $("#left_2kg_button").click(function(){
+        add_to_console("Set 2kg for left");
+        socket.emit('mark_twokg', {hand: 'left'});
+    });
+
+    $("#right_2kg_button").click(function(){
+        add_to_console("Set 2kg for right");
+        socket.emit('mark_twokg', {hand: 'right'});
     });
 
     $("#stopbutton").click(function(){

@@ -221,6 +221,14 @@ def zero_sensors(x):
     print "Zero'd both sensors"
 
 
+@socketio.on('mark_twokg')
+def mark_twokg(data):
+    crusher =  getattr(app, data['hand'])
+    crusher.twokg = crusher.analog_reading()
+    print "Set 2kg value for {} to {}".format(crusher.name, crusher.twokg)
+
+
+
 @socketio.on('lift_slightly')
 def lift_slightly(x):
     app.left.set_direction(UP)
