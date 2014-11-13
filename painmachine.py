@@ -51,6 +51,9 @@ live_pins = {
     }
 }
 
+live_pins['left']['limit_top_pin'].enable_reporting()
+live_pins['right']['limit_top_pin'].enable_reporting()
+
 gevent.sleep(.5)
 
 
@@ -60,7 +63,9 @@ while True:
         print "found sensors."
         break
 
-print "Checking switches...",
+
+print "Checking switches..."
+
 while True:
     l, r = live_pins['left']['limit_top_pin'].read(), live_pins['right']['limit_top_pin'].read()
     if l is not None and r is not None:  # test for not None because switch could be false at startup
@@ -88,17 +93,39 @@ class Crusher(object):
         self.zero = zero  # zero set by reading the sensors when creating instance
         self.twokg = twokg  # voltage reading when 2kg applied to sensor
 
+        self._top_switch_gen = self._switch_state_generator()
+        self.at_top = self._top_switch_gen.next()
+
+    def update_switch_states(self):
+        self.at_top = self._top_switch_gen.next()
+
     def set_direction(self, direction):
         if self.direction != direction:
-            print "Setting", self.name, MOVEMENT_LABELS[direction]
+            # print "Setting", self.name, MOVEMENT_LABELS[direction]
             live_pins[self.name]['direction_pin'].write(direction)
             self.direction = direction
 
-    def at_top(self):
-        # note we use bool(not not self.limit_top_pin.read()) because
-        # switch logic is reversed (normally high, pulled low when switch is
-        # depressed)
-        return bool(not live_pins[self.name]['limit_top_pin'].read())
+    def _switch_state_generator(self):
+            """Introduce min delay in readings and hysteresis for change in state"""
+
+            pin = live_pins[self.name]['limit_top_pin']
+
+            windowlen = 10
+            window = deque(maxlen=windowlen)
+            window.extend([True] * windowlen)
+            state = True
+
+            while True:
+                gevent.sleep(.0005)  # 5ms
+                window.append(pin.read())
+
+                if all(window):
+                    state = True
+
+                elif not any(window):
+                    state = False
+
+                yield state
 
     def go_to_top_and_init(self):
 
@@ -130,7 +157,7 @@ class Crusher(object):
             return -2
 
             # don't go within 100 steps of the top
-        if self.direction is UP and self.at_top():
+        if self.direction is UP and self.at_top:
             # print self.name, "too high to step. Now at ", self.steps_from_top, "Need to step ", n
             return -1
 
@@ -169,6 +196,7 @@ class Crusher(object):
 
     def track(self):
         """Pulse and change direction to track target weight."""
+        self.update_switch_states()
         nsamples = 6  # number of weight samples to take
         margin = max([ALLOWABLE_DISCREPANCY, self.target * .05])
         delta = self.target - (sum(self.grams() for i in range(nsamples)) / nsamples)
@@ -225,10 +253,11 @@ def _log_session_data(data):
     with open(os.path.join(LOGFILE_DIR, app.logfilename), "a") as f:
         f.write(str(data) + "\n")
     if data.get('message', None):
-        print data.get('message')
+        # print data.get('message')
         socketio.emit('log', data)
     else:
-        print "Wrote to log: ", str(data)
+        pass
+        # print "Wrote to log: ", str(data)
 
 
 @socketio.on('log_session_data')
@@ -385,8 +414,9 @@ if __name__ == "__main__":
 
     gevent.joinall([
         # only run the piston if enabled in settings
-        ENABLE_PISTON.left and gevent.spawn(app.left.go_to_top_and_init),
         ENABLE_PISTON.right and gevent.spawn(app.right.go_to_top_and_init),
+        ENABLE_PISTON.left and gevent.spawn(app.left.go_to_top_and_init),
+
         gevent.spawn(tight),
         gevent.spawn(log_sensors),
         gevent.spawn(update_dash),
