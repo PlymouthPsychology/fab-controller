@@ -100,6 +100,13 @@ $( document ).ready(function() {
     });
 
 
+
+    $("#toggle_tracking_button").click(function(){
+        add_to_console("Toggle tracking");
+        socket.emit('toggle_tracking', {});
+    });
+
+
     $("#left_2kg_button").click(function(){
         add_to_console("Set 2kg for left");
         socket.emit('mark_twokg', {hand: 'left'});

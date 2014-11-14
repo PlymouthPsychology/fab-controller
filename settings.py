@@ -17,7 +17,7 @@ STEP_DELAY = .0004  # Delay between setting pin high and low when pulsing the st
 TIGHT_LOOP_INTERVAL = .00001  # delay after running each iteration of the tracking loop
 
 ALLOWABLE_DISCREPANCY = 20  # delta between sensor reading and target which triggers a movement
-TWO_KG = Pair(0.3392, 0.3392)  # sensor readings at 2kg load - these need to be measured!!!
+TWO_KG = Pair(0.4457, 0.4692)  # sensor readings at 2kg load - these need to be measured!!!
 DASHBOARD_UPDATE_INTERVAL = .2
 SERVER_PORT = 2008
 

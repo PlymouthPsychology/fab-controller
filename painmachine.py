@@ -87,6 +87,7 @@ class Crusher(object):
 
     def __init__(self, zero, twokg, name="leftorright"):
 
+        self.tracking = True
         self.target = 0  # target weight for this crusher in grams
         self.direction = UP  # default to going up
         self.name = name
@@ -196,6 +197,8 @@ class Crusher(object):
 
     def track(self):
         """Pulse and change direction to track target weight."""
+        if not self.tracking:
+            return
         self.update_switch_states()
         nsamples = 6  # number of weight samples to take
         margin = max([ALLOWABLE_DISCREPANCY, self.target * .05])
@@ -271,6 +274,14 @@ def restonfingers(x):
     app.left.target = 20
     app.right.target = 20
     _log_session_data({'message': "Resting on fingers"})
+
+
+@socketio.on('toggle_tracking')
+def toggle_tracking(x):
+    app.left.tracking = not app.left.tracking
+    app.right.tracking = not app.right.tracking
+    print "Toggled tracking to:", app.left.tracking, app.right.tracking
+
 
 
 @socketio.on('zero_sensor')
@@ -374,8 +385,10 @@ def programme_countdown():
 
 def update_dash():
     while 1:
-        socketio.emit('update_dash', {'data': make_dashdata(app)})
+        data = make_dashdata(app)
+        socketio.emit('update_dash', {'data': data})
         gevent.sleep(DASHBOARD_UPDATE_INTERVAL)
+        # print data
 
 
 def tight():
