@@ -117,6 +117,31 @@ $( document ).ready(function() {
         socket.emit('mark_twokg', {hand: 'right'});
     });
 
+
+
+
+    $("#left_pulse_down_button").mousehold(function(i) {
+        add_to_console("Pulse left");
+        socket.emit('manual_pulse', {direction: 'down', hand: 'left', n: 1});
+    });
+
+    $("#right_pulse_down_button").mousehold(function(i) {
+        add_to_console("Pulse right");
+        socket.emit('manual_pulse', {direction: 'down', hand: 'right', n: 1});
+    });
+
+    $("#left_pulse_up_button").mousehold(function(i) {
+        add_to_console("Pulse left");
+        socket.emit('manual_pulse', {direction: 'up', hand: 'left', n: 1});
+    });
+
+    $("#right_pulse_up_button").mousehold(function(i) {
+        add_to_console("Pulse right");
+        socket.emit('manual_pulse', {direction: 'up', hand: 'right', n: 1});
+    });
+
+   
+
     $("#stopbutton").click(function(){
         add_to_console("!Stop everything")
         socket.emit('stopall', {});

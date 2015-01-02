@@ -19,6 +19,7 @@ def get_board():
 
     board = ArduinoMega("/dev/"+tty)
     sleep(.5)
+    
     it = util.Iterator(board)
     it.start()
 

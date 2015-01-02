@@ -27,6 +27,7 @@ SERVER_PORT = 2008
 STEP_PIN = Pair(2, 3)
 DIRECTION_PIN = Pair(6, 7)
 HIGH_LIMIT_PIN = Pair(17, 18)
+LOW_LIMIT_PIN = Pair(15, 16)
 SENSOR_PIN = Pair(4, 5)  # note these are the analog pins
 
 UP = 0  # specify direction of rotation

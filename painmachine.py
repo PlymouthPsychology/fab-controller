@@ -1,9 +1,10 @@
-import os
-import signal
-import sys
 from collections import deque
 from datetime import datetime
+import os
 import re
+import signal
+import sys
+
 from flask import Flask, Response, redirect
 from flask.ext.socketio import SocketIO, send, emit
 from getarduino import get_board
@@ -22,7 +23,6 @@ app.logfilename = "log.txt"
 
 print "Acquiring the arduino board and starting iterator..."
 board, boarditerator = get_board()
-gevent.sleep(.2)
 
 
 # this is IMPORTANT!!
@@ -38,38 +38,51 @@ signal.signal(signal.SIGINT, signal_handler)
 print "Setting up pins"
 live_pins = {
     'left': {
-        'limit_top_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.left)),
+        'high_limit_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.left)),
+        'low_limit_pin': board.get_pin('d:{}:i'.format(LOW_LIMIT_PIN.left)),
         'sensor_pin': board.get_pin('a:{}:i'.format(SENSOR_PIN.left)),
         'step_pin': board.get_pin('d:{}:o'.format(STEP_PIN.left)),
         'direction_pin': board.get_pin('d:{}:o'.format(DIRECTION_PIN.left)),
     },
     'right': {
-        'limit_top_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.right)),
+        'high_limit_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.right)),
+        'low_limit_pin': board.get_pin('d:{}:i'.format(LOW_LIMIT_PIN.right)),
         'sensor_pin': board.get_pin('a:{}:i'.format(SENSOR_PIN.right)),
         'step_pin': board.get_pin('d:{}:o'.format(STEP_PIN.right)),
         'direction_pin': board.get_pin('d:{}:o'.format(DIRECTION_PIN.right)),
     }
 }
 
-live_pins['left']['limit_top_pin'].enable_reporting()
-live_pins['right']['limit_top_pin'].enable_reporting()
 
-gevent.sleep(.5)
-
-
-print "Checking sensors...",
-while True:
-    if live_pins['left']['sensor_pin'].read() and live_pins['right']['sensor_pin'].read():
-        print "found sensors."
-        break
-
+live_pins['left']['sensor_pin'].enable_reporting()
+live_pins['right']['sensor_pin'].enable_reporting()
 
 print "Checking switches..."
 
 while True:
-    l, r = live_pins['left']['limit_top_pin'].read(), live_pins['right']['limit_top_pin'].read()
+    gevent.sleep(.1)
+    l, r = live_pins['left']['high_limit_pin'].read(), live_pins['right']['high_limit_pin'].read()
     if l is not None and r is not None:  # test for not None because switch could be false at startup
         print "found top limit switches."
+        print "left is", l
+        print "right is", r
+        break
+
+while True:
+    gevent.sleep(.1)
+    l, r = live_pins['left']['low_limit_pin'].read(), live_pins['right']['low_limit_pin'].read()
+    if l is not None and r is not None:  # test for not None because switch could be false at startup
+        print "found bottom limit switches."
+        print "left is", l
+        print "right is", r
+        break
+
+
+print "Checking sensors...",
+while True:
+    gevent.sleep(.1)
+    if live_pins['left']['sensor_pin'].read() and live_pins['right']['sensor_pin'].read():
+        print "found sensors."
         break
 
 
@@ -94,8 +107,10 @@ class Crusher(object):
         self.zero = zero  # zero set by reading the sensors when creating instance
         self.twokg = twokg  # voltage reading when 2kg applied to sensor
 
-        self._top_switch_gen = self._switch_state_generator()
+        self._top_switch_gen = self._switch_state_generator("top")
+        self._bottom_switch_gen = self._switch_state_generator("bottom")
         self.at_top = self._top_switch_gen.next()
+        self.at_bottom = self._bottom_switch_gen.next()
 
     def update_switch_states(self):
         self.at_top = self._top_switch_gen.next()
@@ -106,10 +121,13 @@ class Crusher(object):
             live_pins[self.name]['direction_pin'].write(direction)
             self.direction = direction
 
-    def _switch_state_generator(self):
+    def _switch_state_generator(self, position):
             """Introduce min delay in readings and hysteresis for change in state"""
 
-            pin = live_pins[self.name]['limit_top_pin']
+            if position == "top":
+                pin = live_pins[self.name]['high_limit_pin']
+            else:
+                pin = live_pins[self.name]['low_limit_pin']
 
             windowlen = 10
             window = deque(maxlen=windowlen)
@@ -118,7 +136,7 @@ class Crusher(object):
 
             while True:
                 gevent.sleep(.0005)  # 5ms
-                window.append(pin.read())
+                window.append(not pin.read())  # reverse here
 
                 if all(window):
                     state = True
@@ -135,9 +153,9 @@ class Crusher(object):
 
         _i = 0
         while self.pulse() > 0:  # pulse returns the number of steps moved
-            # sys.stdout.write("\r{} pulses up".format(_i))
+            sys.stdout.write("\r{} pulses up".format(_i))
             _i += 1
-            # sys.stdout.flush()
+            sys.stdout.flush()
 
         print "\n", self.name, "is at top limit switch."
         self.set_direction(DOWN)
@@ -153,7 +171,7 @@ class Crusher(object):
         -2 = At bottom
         """
 
-        if self.direction is DOWN and self.steps_from_top >= (MAX_STEPS - n):
+        if self.direction is DOWN and self.steps_from_top >= (MAX_STEPS - n) and not self.at_bottom:
             # print self.name, "too low to step. Now at ", self.steps_from_top, "Need to step ", n
             return -2
 
@@ -371,6 +389,10 @@ def set_block_targets(grams):
     _log_session_data({"targets": grams})
 
 
+
+
+# THE LOOPS JOINED BY GEVENT
+
 def programme_countdown():
     while True:
         if app.programme_countdown is not None:
@@ -388,8 +410,6 @@ def update_dash():
         data = make_dashdata(app)
         socketio.emit('update_dash', {'data': data})
         gevent.sleep(DASHBOARD_UPDATE_INTERVAL)
-        # print data
-
 
 def tight():
     while 1:
@@ -424,7 +444,7 @@ if __name__ == "__main__":
         TWO_KG.right,
         "right"
     )
-
+    
     gevent.joinall([
         # only run the piston if enabled in settings
         ENABLE_PISTON.right and gevent.spawn(app.right.go_to_top_and_init),

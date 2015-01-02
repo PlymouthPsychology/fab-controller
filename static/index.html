@@ -14,6 +14,7 @@
     <script type="application/ecmascript" async="" src="Blob.js"></script>
     <script type="application/ecmascript" async="" src="FileSaver.js"></script>
     <script src="ucsv-1.2.0.min.js"></script>
+    <script type="text/javascript" src="mousehold.js"></script>
     <script type="text/javascript" src="painmachine.js"></script>
 </head>
 
@@ -75,6 +76,7 @@
                 <ul class="nav nav-tabs" role="tablist">
                   <li class="active"><a href="#manual" role="tab" data-toggle="tab">Manual</a></li>
                   <li><a href="#program" role="tab" data-toggle="tab">Programmed</a></li>
+                  <li><a href="#calibration" role="tab" data-toggle="tab">Calibration tools</a></li>
                 </ul>
 
                 <!-- Tab panes -->
@@ -82,10 +84,14 @@
                     <div class="tab-pane active" id="manual">
                         <h6>Manual control</h6>
                         <h6>Left</h6>
-                        <div id="leftslider" class="sliderbox" ></div>
+                        <div id="leftslider" class="sliderbox" ></div> 
                         <h6>Right</h6>
-                        <div class="sliderbox" id="rightslider"></div>
+                        <div class="sliderbox" id="rightslider"></div> 
                         <hr>
+                    
+                         
+                          
+
                     </div>
 
                     <div class="tab-pane" id="program">
@@ -128,6 +134,29 @@
 
                     </div>
                 </div>
+
+                <div class="tab-pane" id="calibration">
+                    <button id="zerobutton" class="btn btn-xs">Zero sensors</button>
+                    <button id="left_2kg_button" class="btn btn-xs">Mark left @2kg</button>
+                    <button id="right_2kg_button" class="btn btn-xs">Mark right @2kg</button>
+                    <button id="toggle_tracking_button" class="btn btn-xs">Toggle tracking</button>
+        
+                    <table>
+                        <tr>
+                            <td class="small" >Left</td>
+                            <td class="small">Right</td>
+                        </tr>
+                        <tr>
+                        <td><button id="left_pulse_up_button" class="btn btn-xs">↑</button></td>
+                        <td><button id="right_pulse_up_button" class="btn btn-xs">↑</button></td>
+                        </tr>
+                        <tr>
+                        <td><button id="left_pulse_down_button" class="btn btn-xs">↓</button></td>
+                        <td><button id="right_pulse_down_button" class="btn btn-xs">↓</button></td>
+                        </tr>
+                    </table>    
+        
+                </div>
             </div>
             </div>
 
@@ -144,10 +173,6 @@
                     </table>
                 </div>
 
-
-
-
-
                 <!-- <div class="well small">
                         <p>
                             <a class="downloadlogbutton btn btn-mini btn-primary" href="#">Download full log</a>
@@ -158,25 +183,8 @@
                 </div> -->
 
             </div>
-
-    <!-- Settings -->
-    <div class="row">
-        <div class="span12">
-            <hr>
-            <center>
-
-                <button id="zerobutton" class="btn btn-xs">Zero sensors</button>
-
-                <button id="left_2kg_button" class="btn btn-xs">Mark left @2kg</button>
-
-                <button id="right_2kg_button" class="btn btn-xs">Mark right @2kg</button>
-
-
-                <button id="toggle_tracking_button" class="btn btn-xs">Toggle tracking</button>
-
-                <hr>
-        </div>
     </div>
+    <!-- Settings -->
 
     </div>
 </body>
