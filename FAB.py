@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+import webbrowser
 from collections import deque
 from datetime import datetime
 import os
@@ -6,13 +9,13 @@ import signal
 import sys
 
 from flask import Flask, Response, redirect
-from flask.ext.socketio import SocketIO, send, emit
-from getarduino import get_board
+from flask_socketio import SocketIO, send, emit
+from _getarduino import get_board
 import gevent
-from pain_logging import *
+from _pain_logging import *
 from settings import *
 
-print "Configuring flask app"
+print("Configuring flask app")
 app = Flask(__name__, )
 app.config['debug'] = False
 socketio = SocketIO(app)
@@ -21,12 +24,13 @@ app.programme_countdown = None
 app.logfilename = "log.txt"
 
 
-print "Acquiring the arduino board and starting iterator..."
+print("Acquiring the arduino board and starting iterator...")
 board, boarditerator = get_board()
 
 
-# this is IMPORTANT!!
-# if not fired the board will need to be unplgged and plugged in again
+# THIS IS IMPORTANT!!
+# If board.exit() not fired the board will need to be unplgged and 
+# plugged in again to work correctly.
 def signal_handler(signal, frame):
     print('You pressed Ctrl+C! Cleaning up...')
     board.exit()
@@ -35,7 +39,7 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
-print "Setting up pins"
+print("Setting up pins")
 live_pins = {
     'left': {
         'high_limit_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.left)),
@@ -54,35 +58,48 @@ live_pins = {
 }
 
 
+led = board.get_pin('d:13:o')
+
+
+def flash():
+    print("flash!", end=' ')
+    led.write(1)
+    gevent.sleep(.1)
+    led.write(0)
+    gevent.sleep(.1)
+
+
 live_pins['left']['sensor_pin'].enable_reporting()
 live_pins['right']['sensor_pin'].enable_reporting()
 
-print "Checking switches..."
+
+print("Checking switches...")
+[flash() for i in range(10)]
 
 while True:
     gevent.sleep(.1)
     l, r = live_pins['left']['high_limit_pin'].read(), live_pins['right']['high_limit_pin'].read()
     if l is not None and r is not None:  # test for not None because switch could be false at startup
-        print "found top limit switches."
-        print "left is", l
-        print "right is", r
+        print("found top limit switches.")
+        print("left is", l)
+        print("right is", r)
         break
 
 while True:
     gevent.sleep(.1)
     l, r = live_pins['left']['low_limit_pin'].read(), live_pins['right']['low_limit_pin'].read()
     if l is not None and r is not None:  # test for not None because switch could be false at startup
-        print "found bottom limit switches."
-        print "left is", l
-        print "right is", r
+        print("found bottom limit switches.")
+        print("left is", l)
+        print("right is", r)
         break
 
 
-print "Checking sensors...",
+print("Checking sensors...", end=' ')
 while True:
     gevent.sleep(.1)
     if live_pins['left']['sensor_pin'].read() and live_pins['right']['sensor_pin'].read():
-        print "found sensors."
+        print("found sensors.")
         break
 
 
@@ -95,7 +112,7 @@ class Crusher(object):
     """Manages a finger crusher, including sensor, motor and limit switches."""
 
     direction = None
-    steps_from_top = 0  # note this may not be correct on switch on, but we will initialise by driving to top
+    steps_from_top = 3000  # note this may not be correct on switch on, but we will initialise by driving to top
     target = None
 
     def __init__(self, zero, twokg, name="leftorright"):
@@ -109,15 +126,14 @@ class Crusher(object):
 
         self._top_switch_gen = self._switch_state_generator("top")
         self._bottom_switch_gen = self._switch_state_generator("bottom")
-        self.at_top = self._top_switch_gen.next()
-        self.at_bottom = self._bottom_switch_gen.next()
+        self.at_top = next(self._top_switch_gen)
+        self.at_bottom = next(self._bottom_switch_gen)
 
     def update_switch_states(self):
-        self.at_top = self._top_switch_gen.next()
+        self.at_top = next(self._top_switch_gen)
 
     def set_direction(self, direction):
         if self.direction != direction:
-            # print "Setting", self.name, MOVEMENT_LABELS[direction]
             live_pins[self.name]['direction_pin'].write(direction)
             self.direction = direction
 
@@ -129,15 +145,15 @@ class Crusher(object):
             else:
                 pin = live_pins[self.name]['low_limit_pin']
 
-            windowlen = 10
+            windowlen = SWITCH_CHECKING_WINDOW_LENGTH
             window = deque(maxlen=windowlen)
             window.extend([True] * windowlen)
             state = True
 
             while True:
-                gevent.sleep(.0005)  # 5ms
                 window.append(not pin.read())  # reverse here
 
+                # note, we don't always *change* state...
                 if all(window):
                     state = True
 
@@ -146,22 +162,40 @@ class Crusher(object):
 
                 yield state
 
+
+    def go_to_top(self):
+        self.set_direction(UP)
+        gevent.sleep(.1)
+
+        while True:
+            self.update_switch_states()
+            if self.pulse() < 1:
+                break
+            gevent.sleep(0)
+
+
     def go_to_top_and_init(self):
 
-        print "Moving", self.name, "to top to initialise."
-        self.set_direction(UP)
-
-        _i = 0
-        while self.pulse() > 0:  # pulse returns the number of steps moved
-            sys.stdout.write("\r{} pulses up".format(_i))
-            _i += 1
-            sys.stdout.flush()
-
-        print "\n", self.name, "is at top limit switch."
+        print("Moving down slightly")
         self.set_direction(DOWN)
-        self.pulse(REST_N_FROM_TOP)
-        print self.name, "is ready"
+        gevent.sleep(.1)
+        self.pulse(n=100)
+
+        print("Moving", self.name, "to top to initialise.")
+        self.go_to_top()
+
         self.steps_from_top = 0
+        print("\n", self.name, "is at top limit switch.")
+
+        self.set_direction(DOWN)
+        gevent.sleep(.1)
+        for i in range(REST_N_FROM_TOP):
+            self.pulse()
+            gevent.sleep(0)
+
+        print("\n", self.name, "is ready")
+
+
 
     def pulse(self, n=1):
         """Pulse the stepper motor if safe to do so. Return error code or
@@ -172,14 +206,18 @@ class Crusher(object):
         """
 
         if self.direction is DOWN and self.steps_from_top >= (MAX_STEPS - n) and not self.at_bottom:
-            # print self.name, "too low to step. Now at ", self.steps_from_top, "Need to step ", n
+            print(self.name, "too low to step. Now at ", self.steps_from_top, "Need to step ", n)
             return -2
 
-            # don't go within 100 steps of the top
-        if self.direction is UP and self.at_top:
-            # print self.name, "too high to step. Now at ", self.steps_from_top, "Need to step ", n
-            return -1
+        # don't go within 100 steps of the top
+        if self.direction is UP:
+            if self.steps_from_top < 100 or self.at_top:
+                print(self.name, "too high to step. Now at ", self.steps_from_top, ". At-top=", self.at_top, ". Need to step ", n)
+                if self.at_top:  # reset the counter
+                    self.steps_from_top = 0
+                return -1
 
+        # do the stepping
         p = live_pins[self.name]['step_pin']
         for i in range(n):
             p.write(1)
@@ -187,11 +225,13 @@ class Crusher(object):
             p.write(0)
             gevent.sleep(STEP_DELAY)
 
+        # update the internal step counter
         if self.direction == DOWN:
             self.steps_from_top += n
         else:
-            self.steps_from_top += - n
-
+            self.steps_from_top += -n
+        
+        # print self.name, n, self.steps_from_top, self.at_top, self.direction
         return n
 
     def analog_reading(self):
@@ -201,7 +241,7 @@ class Crusher(object):
     def zero_sensor(self):
         self.zero = self.analog_reading()
         msg = "Setting zero point for {} to analog reading: {}".format(self.name, self.zero)
-        print msg
+        print(msg)
 
     def grams(self):
         """Scale using parameters in settings. Note parameters for each hand/sensor may differ."""
@@ -215,10 +255,12 @@ class Crusher(object):
 
     def track(self):
         """Pulse and change direction to track target weight."""
+        self.update_switch_states()
+
         if not self.tracking:
             return
-        self.update_switch_states()
-        nsamples = 6  # number of weight samples to take
+
+        nsamples = SENSOR_MEASUREMENTS_WINDOW_LENGTH
         margin = max([ALLOWABLE_DISCREPANCY, self.target * .05])
         delta = self.target - (sum(self.grams() for i in range(nsamples)) / nsamples)
         adelta = abs(delta) + 1
@@ -262,7 +304,7 @@ def stop_everything(x):
 @socketio.on('set_logfile_name')
 def set_logfile_name(data):
     app.logfilename = data.get("logfilename", "log.txt")
-    print "Updated logfilename to ", app.logfilename
+    print("Updated logfilename to ", app.logfilename)
 
 
 def _log_session_data(data):
@@ -298,7 +340,7 @@ def restonfingers(x):
 def toggle_tracking(x):
     app.left.tracking = not app.left.tracking
     app.right.tracking = not app.right.tracking
-    print "Toggled tracking to:", app.left.tracking, app.right.tracking
+    print("Toggled tracking to:", app.left.tracking, app.right.tracking)
 
 
 
@@ -306,14 +348,14 @@ def toggle_tracking(x):
 def zero_sensors(x):
     app.left.zero_sensor()
     app.right.zero_sensor()
-    print "Zero'd both sensors"
+    print("Zero'd both sensors")
 
 
 @socketio.on('mark_twokg')
 def mark_twokg(data):
     crusher = getattr(app, data['hand'])
     crusher.twokg = crusher.analog_reading()
-    print "Set 2kg value for {} to {}".format(crusher.name, crusher.twokg)
+    print("Set 2kg value for {} to {}".format(crusher.name, crusher.twokg))
 
 
 @socketio.on('lift_slightly')
@@ -322,12 +364,12 @@ def lift_slightly(x):
     app.left.pulse(n=300)
     app.left.set_direction(UP)
     app.left.pulse(n=300)
-    print "Lifted both pistons slightly."
+    print("Lifted both pistons slightly.")
 
 
 @socketio.on('manual_pulse')
 def manual_pulse(data):
-    print "Executing manual pulses", str(data)
+    print("Executing manual pulses", str(data))
     crusher = getattr(app, data['hand'])
     crusher.set_direction(MOVEMENT[data['direction'].lower()])
     crusher.pulse(n=int(data['n']))
@@ -338,6 +380,8 @@ def stopall():
     [i.kill() for i in app.blocks]
     app.blocks.clear()
     set_block_targets(Pair(0, 0))
+    app.left.go_to_top()
+    app.right.go_to_top()
     app.programme_countdown = None
 
 
@@ -347,12 +391,12 @@ def validate_json_program(jsondata):
         lines = [x for x in jsondata['data'].splitlines() if x.strip()]  # strip whitespace
         lines = [x for x in lines if x[0] is not "#"]  # remove comments
         lines = [re.split('\W+|[,]', i) for i in lines]  # split duration, left, right
-        prog_ints = [map(int, i) for i in lines]  # we need integers
-        return map(lambda x: Block(x[0], Pair(x[1], x[2])), prog_ints)  # return blocks
+        prog_ints = [list(map(int, i)) for i in lines]  # we need integers
+        return [Block(x[0], Pair(x[1], x[2])) for x in prog_ints]  # return blocks
 
-    except Exception, e:
+    except Exception as e:
         msg = "Program error: " + str(e)
-        print msg
+        print(msg)
         emit('actionlog', msg, broadcast=True)
         return False
 
@@ -368,7 +412,7 @@ def schedule_program_for_execution(prog):
         Return tuple of the blocks and the total running time of the programme.
         """
         if not programme:
-            print "finished building blocks from prog"
+            print("finished building blocks from prog")
             blocks.append(gevent.spawn_later(cumtime, set_block_targets, Pair(0, 0)))
             blocks.append(gevent.spawn_later(cumtime, _log_session_data, *({'message': "Program complete"})))
             return (blocks, cumtime)
@@ -378,7 +422,7 @@ def schedule_program_for_execution(prog):
             return add_blocks_keeping_running_time(programme, blocks, cumtime + block.duration)
 
     app.blocks, app.programme_countdown = add_blocks_keeping_running_time(prog, deque(), 0)
-    print app.blocks, app.programme_countdown
+    print(app.blocks, app.programme_countdown)
 
 
 def set_block_targets(grams):
@@ -418,6 +462,14 @@ def tight():
         gevent.sleep(TIGHT_LOOP_INTERVAL)
 
 
+def init_crushers():
+    ENABLE_PISTON.left and app.left.go_to_top_and_init()
+    ENABLE_PISTON.right and app.right.go_to_top_and_init()
+    print("Opening browser window")
+    c = webbrowser.get('safari')
+    c.open("127.0.0.1:{}".format(SERVER_PORT), new=0, autoraise=True)
+
+
 def log_sensors():
     while 1:
         if app.left.target > 0 or app.right.target > 0:
@@ -432,7 +484,7 @@ def log_sensors():
 if __name__ == "__main__":
 
     # test the left machine
-    print "Starting crusher instances:",
+    print("Starting crusher instances:")
 
     app.left = Crusher(
         live_pins['left']['sensor_pin'].read(),
@@ -447,9 +499,7 @@ if __name__ == "__main__":
     
     gevent.joinall([
         # only run the piston if enabled in settings
-        ENABLE_PISTON.right and gevent.spawn(app.right.go_to_top_and_init),
-        ENABLE_PISTON.left and gevent.spawn(app.left.go_to_top_and_init),
-
+        gevent.spawn(init_crushers),
         gevent.spawn(tight),
         gevent.spawn(log_sensors),
         gevent.spawn(update_dash),
