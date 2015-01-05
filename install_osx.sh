@@ -11,7 +11,7 @@ fi
 
 echo "Installing controller software"
 git clone https://github.com/puterleat/fab-controller.git
-cd painmachine
+cd fab-controller
 
 echo "Installing dependencies"
 source /usr/local/bin/virtualenvwrapper.sh
