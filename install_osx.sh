@@ -14,6 +14,7 @@ git clone https://github.com/puterleat/fab-controller.git
 cd painmachine
 
 echo "Installing dependencies"
+source /usr/local/bin/virtualenvwrapper.sh
 mkvirtualenv FAB
 pip install -r requirements.txt
 
