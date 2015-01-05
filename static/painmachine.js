@@ -27,7 +27,7 @@ $( document ).ready(function() {
     //the first command sets up the model bindings from dummy json.
     var PainDashboardModel = ko.mapping.fromJS(
         {'target_R': 0, 'sensor_R': 0, 'target_L': 0, 'sensor_L': 0, 'remaining': null,
-         'true_L':0, 'true_R':0, 'logfile': 'log.txt'}
+         'steps_from_top_L':0, 'steps_from_top_R':0, 'logfile': 'log.txt'}
     );
     ko.applyBindings(PainDashboardModel);
 
@@ -140,13 +140,15 @@ $( document ).ready(function() {
         socket.emit('manual_pulse', {direction: 'up', hand: 'right', n: 1});
     });
 
-   
-
     $("#stopbutton").click(function(){
-        add_to_console("!Stop everything")
+        add_to_console("Stopping everything")
         socket.emit('stopall', {});
         socket.emit('lift_slightly', {});
-        socket.emit('lift_slightly', {});
+    });
+
+    $("#return_to_stops_button").click(function(){
+        add_to_console("Returning pistons to top stops.")
+        socket.emit('return_to_stops', {});
     });
 
     $("#getsetbutton").click(function(){
@@ -195,9 +197,9 @@ $( document ).ready(function() {
     });
 
 
-    $(".runbutton").click(function(){
-        add_to_console("! Run program.")
-        socket.emit('new_program', {data: $('#prog').val()});
+    $("#runbutton").click(function(){
+        add_to_console("Running program.");
+        socket.emit('new_program', { data: $('#prog').val() });
     });
 
 

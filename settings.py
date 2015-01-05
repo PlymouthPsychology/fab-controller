@@ -1,4 +1,7 @@
+import os
 from collections import namedtuple
+import random
+
 
 HANDS = ['left', 'right']  # We have two hands
 Pair = namedtuple('Pair', HANDS)  # structure used to store values on each hand
@@ -6,20 +9,23 @@ Block = namedtuple('Block', ['duration', 'grams'])  # grams should itself be a P
 
 
 # FOR TWEAKING
-ENABLE_PISTON = Pair(True, True)  # e.g. only use left crusher for testing
 
 LOG_INTERVAL = .5
-LOGFILE_DIR = "logs"
+LOGFILE_DIR = os.path.expanduser("~/Documents/fab/logs/")
 
-REST_N_FROM_TOP = 1500
+REST_N_FROM_TOP = 500
 
-STEP_DELAY = .0004  # Delay between setting pin high and low when pulsing the stepper motors
-TIGHT_LOOP_INTERVAL = .00001  # delay after running each iteration of the tracking loop
+STEP_DELAY = .0003  # Delay between setting pin high and low when pulsing the stepper motors
+TIGHT_LOOP_INTERVAL = .001  # delay after running each iteration of the tracking loop
+# Note, by default the sensor values are updated every 0.001 of a second by the Iterator instance
+# see https://github.com/tino/pyFirmata/blob/master/pyfirmata/util.py#L38
+# However firmata only updates every 19ms, so this may be spuriously accurate
+# this gives a theoretical speed of ~3mm of travel per second because 5*(1000/8/200)
 
 ALLOWABLE_DISCREPANCY = 20  # delta between sensor reading and target which triggers a movement
 TWO_KG = Pair(0.4457, 0.4692)  # sensor readings at 2kg load - these need to be measured!!!
 DASHBOARD_UPDATE_INTERVAL = .2
-SERVER_PORT = 2008
+SERVER_PORT = random.choice(range(2000, 10000))
 
 
 # PROBABLY BEST LEFT
@@ -40,3 +46,10 @@ STEPS_PER_REV = FULL_STEPS_PER_REV * STEPS_PER_FULL_STEP
 MM_PER_REV = 5  # 5mm of travel per revolution of the motor shaft
 MM_MAX_TRAVEL = 20  # We don't want the motors to move more than this number of mm
 MAX_STEPS = (MM_MAX_TRAVEL / MM_PER_REV) * STEPS_PER_REV
+
+
+SWITCH_CHECKING_WINDOW_LENGTH = 5
+SENSOR_MEASUREMENTS_WINDOW_LENGTH = 5    # number of weight samples to take 
+										 # Note, this number was based on some 
+										 # experimentation - less than 5
+ 

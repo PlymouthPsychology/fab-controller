@@ -1,6 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" >
 <head>
-    <title>The pain machine.</title>
+    <title>Forgione-Barber Finger Pressure Stimulator</title>
     <link href="bootstrap-combined.min.css" rel="stylesheet">
     <link rel="stylesheet" href="jquery-ui.css">
     <link href="styles.css" rel="stylesheet">
@@ -23,12 +23,16 @@
         <div class="row">
             <div class="span4">
                 <hr>
-                <h1>The pain machine</h1>
+                <h3>Forgione-Barber Finger Pressure Stimulator</h3>
+                <h3>Version 2.0</h3>
+
             </div>
-            <div class="span4">
+            <div class="span4 text-center">
                 <hr>
-                    <button id="getsetbutton"  class="btn btn-xlarge ">Get Set</button>
-                    <button id="stopbutton" class="btn btn-xlarge btn-danger" data-bind="enable: target_L() > 0 | target_R() > 0">Stop</button>
+                    <button id="getsetbutton"  class="btn btn-large ">Get Set</button>
+                    <button id="stopbutton" class="btn btn-large btn-danger" >Stop</button>
+                    <button id="return_to_stops_button"  class="btn btn-large btn-success">Reset</button>
+
              <h5 data-bind="visible: remaining() != null">Program time remaining: <span data-bind="text: remaining"></span></h5>
             </div>
 
@@ -56,11 +60,15 @@
                         <td>Logfile</td>
                         <td colspan=2>
                             <input id="logfilename" data-bind="value: logfile()"/></td>
-                    <!-- <tr>
-                        <td>Steps from top</td>
-                        <td data-bind="numericText: true_L"></td>
-                        <td data-bind="numericText: true_R"></td>
-                    </tr> -->
+                    <tr>
+                        <td>At top:</td>
+                        <td>
+                            <span class="glyphicon glyphicon-ok" data-bind="visible: steps_from_top_L < 100"></span>
+                        </td>
+                        <td>
+                            <span class="glyphicon glyphicon-ok" data-bind="visible: steps_from_top_R < 100"></span>
+                        </td>
+                    </tr>
                 </table>
             </div>
         </div>
@@ -102,9 +110,8 @@
 5,750,500
 10,100,100
                         </textarea>
-
                         <p>
-                            <button class="btn btn-success runbutton" data-bind="enable: remaining() === null">Run program</button>
+                            <button id="runbutton" class="btn btn-success" data-bind="enable: remaining() === null">Run program</button>
 
                             <a href="#" class="btn" data-toggle="modal" data-target="#myModal">Help</a>
                         </p>
