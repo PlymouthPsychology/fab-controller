@@ -141,7 +141,7 @@ $( document ).ready(function() {
     });
 
     $("#stopbutton").click(function(){
-        add_to_console("Stopping everything")
+        add_to_console("Stopping everything");
         socket.emit('stopall', {});
         socket.emit('lift_slightly', {});
     });
@@ -201,6 +201,5 @@ $( document ).ready(function() {
         add_to_console("Running program.");
         socket.emit('new_program', { data: $('#prog').val() });
     });
-
 
 });
