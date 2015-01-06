@@ -9,13 +9,23 @@ else
 fi
 
 
+cd ~/Applications/
+
 echo "Installing controller software"
 git clone https://github.com/puterleat/fab-controller.git
-cd fab-controller
+
+
 
 echo "Installing dependencies"
 source /usr/local/bin/virtualenvwrapper.sh
 mkvirtualenv FAB
-pip install -r requirements.txt
+pip install -r ~/Applications/fab-controller/requirements.txt
+
+echo "Creating logfile folder..."
+mkdir -pv ~/Documents/fab/logs/
+touch ~/Documents/fab/logs/log.txt
+
 
 echo "Finished installing"
+
+

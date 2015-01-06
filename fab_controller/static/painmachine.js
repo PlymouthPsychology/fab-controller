@@ -26,7 +26,7 @@ $( document ).ready(function() {
     //data bindings from json which comes in to html elements in the page
     //the first command sets up the model bindings from dummy json.
     var PainDashboardModel = ko.mapping.fromJS(
-        {'target_R': 0, 'sensor_R': 0, 'target_L': 0, 'sensor_L': 0, 'remaining': null,
+        { 'target_R': 0, 'sensor_R': 0, 'target_L': 0, 'sensor_L': 0, 'remaining': null,
          'steps_from_top_L':0, 'steps_from_top_R':0, 'logfile': 'log.txt'}
     );
     ko.applyBindings(PainDashboardModel);

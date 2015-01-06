@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-# -u means unbuffered print statements
-source /usr/local/bin/virtualenvwrapper.sh
-workon FAB
-# ~/Applications/fab-controller/
-python -u FAB.py
-# tail -f ~/Documents/fab-controller/logs/*
-

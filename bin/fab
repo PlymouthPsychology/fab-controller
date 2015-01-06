@@ -1,0 +1,32 @@
+#! python
+
+from fab_controller.FAB import *
+import os
+
+
+if __name__ == "__main__":
+
+    if not os.path.exists(LOGFILE_DIR):
+        os.makedirs(LOGFILE_DIR)
+
+    app.left = Crusher(
+        live_pins['left']['sensor_pin'].read(),  # this sets the initial zero value to the current reading
+        TWO_KG.left,
+        "left"
+    )
+    app.right = Crusher(
+        live_pins['right']['sensor_pin'].read(),
+        TWO_KG.right,
+        "right"
+    )
+    
+    gevent.joinall([
+        gevent.spawn(app.left.go_to_top_and_init),
+        gevent.spawn(app.right.go_to_top_and_init),
+        gevent.spawn(open_interface),
+        gevent.spawn(tight),
+        gevent.spawn(log_sensors),
+        gevent.spawn(update_dash),
+        gevent.spawn(programme_countdown),
+        socketio.run(app, host="0.0.0.0", port=SERVER_PORT)
+    ])

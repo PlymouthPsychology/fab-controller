@@ -17,6 +17,8 @@ import gevent
 from settings import *
 
 
+print SERVER_PORT
+
 def get_arduino_name():
     """Tries to find an Arduino acting as a usb modem. If multiple
     candidates found asks user to select one."""
@@ -47,36 +49,17 @@ def get_board(tty):
     return board, it
 
 
-print("Configuring flask app")
+
 app = Flask(__name__, )
 app.config['debug'] = False
 socketio = SocketIO(app)
 app.blocks = deque()
 app.programme_countdown = None
-app.logfilename = "log.txt"
+app.logfilename = "log.txt"  # a default
 
 # Acquire the Arduino board via serial usb
 print("Acquiring the arduino board and starting iterator...")
 board, boarditerator = get_board(get_arduino_name())
-
-
-# Allow to flash debug messages on build in LED
-led = board.get_pin('d:13:o')
-
-def flash(length="-"):
-    "Flash the built in LED on the arduino for debugging."
-    duration = {'-': .5, ".":.1}[length]
-    print(length)
-    led.write(1)
-    gevent.sleep(duration)
-    led.write(0)
-    gevent.sleep(duration)
-
-
-def morse(str):
-    "Flash dots and dashes on the built in LED"
-    [flash(i) for i in str]
-
 
 
 # THIS IS IMPORTANT!!
@@ -239,8 +222,6 @@ class Crusher(object):
 
         print("\n", self.name, "is ready")
 
-
-
     def pulse(self, n=1):
         """Pulse the stepper motor if safe to do so. Return error code or
         number of steps.
@@ -249,7 +230,6 @@ class Crusher(object):
         AT_TOP = -1
         AT_BOTTOM = -2
 
-        
         self.update_switch_states()
 
         if self.direction is DOWN and self.steps_from_top >= (MAX_STEPS - n) and not self.at_bottom:
@@ -258,7 +238,7 @@ class Crusher(object):
 
         if self.direction is UP:
             # don't go within 100 steps of the top for safety/smoothness
-            if self.steps_from_top < 100 or self.at_top:
+            if self.steps_from_top <= 100 or self.at_top:
                 print(self.name, "too high to step. Now at ", self.steps_from_top, ". At-top=", self.at_top, ". Need to step ", n)
                 
                 # reset the counter if we have somehow got to the top switch, e.g. by skipping or miscounting steps
@@ -324,7 +304,6 @@ class Crusher(object):
 @app.route('/')
 def hello():
     return redirect("/index.html", code=302)
-
 
 @app.route('/<path:path>')
 def static_proxy(path):
@@ -543,6 +522,7 @@ def open_interface():
     print("Opening user interface in browser window")
     c = webbrowser.get('safari')
     c.open("127.0.0.1:{}".format(SERVER_PORT), new=0, autoraise=True)
+    
 
 def log_sensors():
     while 1:
@@ -572,12 +552,14 @@ if __name__ == "__main__":
     )
     
     gevent.joinall([
+        socketio.run(app, host="0.0.0.0", port=SERVER_PORT),
+        gevent.spawn(open_interface),
+        gevent.spawn(update_dash),
         gevent.spawn(app.left.go_to_top_and_init),
         gevent.spawn(app.right.go_to_top_and_init),
-        gevent.spawn(open_interface),
         gevent.spawn(tight),
         gevent.spawn(log_sensors),
-        gevent.spawn(update_dash),
+        
         gevent.spawn(programme_countdown),
-        socketio.run(app, host="0.0.0.0", port=SERVER_PORT)
+        
     ])

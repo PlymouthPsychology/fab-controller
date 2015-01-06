@@ -58,17 +58,19 @@
                     </tr>
                     <tr>
                         <td>Logfile</td>
-                        <td colspan=2>
-                            <input id="logfilename" data-bind="value: logfile()"/></td>
-                    <tr>
-                        <td>At top:</td>
-                        <td>
-                            <span class="glyphicon glyphicon-ok" data-bind="visible: steps_from_top_L < 100"></span>
-                        </td>
-                        <td>
-                            <span class="glyphicon glyphicon-ok" data-bind="visible: steps_from_top_R < 100"></span>
+                        <td colspan="2">
+                            <input id="logfilename" data-bind="value: logfile()"/>
                         </td>
                     </tr>
+                    <!-- <tr>
+                        <td>Steps from top</td>
+                        <td>
+                            <span data-bind="numericText: steps_from_top_L"></span>
+                        </td>
+                        <td>
+                            <span data-bind="numericText: steps_from_top_R"></span>
+                        </td>
+                    </tr> -->
                 </table>
             </div>
         </div>

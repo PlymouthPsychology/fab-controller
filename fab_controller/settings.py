@@ -11,7 +11,7 @@ Block = namedtuple('Block', ['duration', 'grams'])  # grams should itself be a P
 # FOR TWEAKING
 
 LOG_INTERVAL = .5
-LOGFILE_DIR = os.path.abspath(os.path.expanduser("~/Documents/fab/logs/"))
+LOGFILE_DIR = os.path.expanduser("~/Documents/fab/logs/")
 
 REST_N_FROM_TOP = 500
 
@@ -25,7 +25,7 @@ TIGHT_LOOP_INTERVAL = .001  # delay after running each iteration of the tracking
 ALLOWABLE_DISCREPANCY = 20  # delta between sensor reading and target which triggers a movement
 TWO_KG = Pair(0.4457, 0.4692)  # sensor readings at 2kg load - these need to be measured!!!
 DASHBOARD_UPDATE_INTERVAL = .2
-SERVER_PORT = random.choice(range(2000, 10000))
+SERVER_PORT = 8000 #random.choice(range(2000, 10000))
 
 
 # PROBABLY BEST LEFT
@@ -36,6 +36,7 @@ HIGH_LIMIT_PIN = Pair(17, 18)
 LOW_LIMIT_PIN = Pair(15, 16)
 SENSOR_PIN = Pair(4, 5)  # note these are the analog pins
 
+
 UP = 0  # specify direction of rotation
 DOWN = 1
 MOVEMENT_LABELS = {UP: 'up', DOWN: 'down'}
@@ -44,9 +45,9 @@ STEPS_PER_FULL_STEP = 8  # We use micro stepping, so 8 pulses per full step of t
 FULL_STEPS_PER_REV = 200
 STEPS_PER_REV = FULL_STEPS_PER_REV * STEPS_PER_FULL_STEP
 MM_PER_REV = 5  # 5mm of travel per revolution of the motor shaft
-MM_MAX_TRAVEL = 5  # We don't want the motors to move more than this number of mm
+MM_MAX_TRAVEL = 15  # We don't want the motors to move more than this number of mm
 MAX_REVS = MM_MAX_TRAVEL / MM_PER_REV
-MAX_STEPS = MAX_REVS * FULL_STEPS_PER_REV
+MAX_STEPS = MAX_REVS * STEPS_PER_REV
 
 
 
