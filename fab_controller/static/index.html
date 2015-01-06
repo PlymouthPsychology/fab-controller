@@ -24,16 +24,17 @@
             <div class="span4">
                 <hr>
                 <h3>Forgione-Avent-Barber Finger Pressure Stimulator</h3>
-                <h3>Version 0.9.7</h3>
+                <h3>Version <span data-bind="text: version()"></span> </h3>
 
             </div>
-            <div class="span4 text-center">
+            <div class="span4">
                 <hr>
-                    <button id="getsetbutton"  class="btn btn-large ">Get Set</button>
-                    <button id="stopbutton" class="btn btn-large btn-danger" >Stop</button>
-                    <button id="return_to_stops_button"  class="btn btn-large btn-success">Reset</button>
+                    <a id="getsetbutton" class="btn btn-large" href="#">Get Set</a>
+                    <a id="stopbutton" class="btn btn-large btn-danger"  href="#">Stop</a>
+                    <a id="return_to_stops_button"  class="btn btn-large btn-success"  href="#">Reset</a>
 
              <h5 data-bind="visible: remaining() != null">Program time remaining: <span data-bind="text: remaining"></span></h5>
+            
             </div>
 
             <div class="span4">
@@ -56,32 +57,16 @@
                         <td
                             data-bind="numericText: sensor_R, style: { color: Math.abs(target_R() - sensor_R()) > 15 ? 'red' : 'green' }"></td>
                     </tr>
-                    <tr>
-                        <td>Logfile</td>
-                        <td colspan="2">
-                            <input id="logfilename" data-bind="value: logfile()"/>
-                        </td>
-                    </tr>
-                    <!-- <tr>
-                        <td>Steps from top</td>
-                        <td>
-                            <span data-bind="numericText: steps_from_top_L"></span>
-                        </td>
-                        <td>
-                            <span data-bind="numericText: steps_from_top_R"></span>
-                        </td>
-                    </tr> -->
                 </table>
             </div>
         </div>
         <div class="row">
             <div class="span12">
-                <hr>
+            &nbsp;
             </div>
         </div>
         <div class="row">
-            <div class="span6">
-                <h4>Controls</h4>
+            <div class="span7">
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist">
                   <li class="active"><a href="#manual" role="tab" data-toggle="tab">Manual</a></li>
@@ -92,7 +77,7 @@
                 <!-- Tab panes -->
                 <div class="tab-content">
                     <div class="tab-pane active" id="manual">
-                        <h6>Manual control</h6>
+                        <h6>Manually set target weights</h6>
                         <h6>Left</h6>
                         <div id="leftslider" class="sliderbox" ></div> 
                         <h6>Right</h6>
@@ -150,6 +135,9 @@
                     <button id="right_2kg_button" class="btn btn-xs">Mark right @2kg</button>
                     <button id="toggle_tracking_button" class="btn btn-xs">Toggle tracking</button>
         
+                    <hr>
+
+                    <h5>Manually pulse</h5>
                     <table>
                         <tr>
                             <td class="small" >Left</td>
@@ -172,29 +160,39 @@
 
 
 
-            <div class="span6">
-                <h4>Log</h4>
-                <div class="console">
-                    <table class="table logtable table-condensed table-striped" id="log">
-                      <tbody>
-                        <tr><td></td></tr>
-                      </tbody>
-                    </table>
+            <div class="span4 push offset1">
+
+                <ul class="nav nav-tabs" role="tablist">
+                  <li class="active"><a href="#consoletab" role="tab" data-toggle="tab">Console</a></li>
+
+                  <li class=""><a href="#logtab" role="tab" data-toggle="tab">Detailed log</a></li>
+
+                </ul>
+
+                <div class="tab-content">
+                    <div class="tab-pane active" id="consoletab">
+                        <div class="console text-muted" id="console">
+                            <p></p>
+                        </div>
+                    </div>
+
+
+                    <div class="tab-pane" id="logtab">
+                        <p>Log files are saved in your ~/Documents folder</p>
+                        
+                        <p>Enter log file name:</p>
+                            <input id="logfilename" data-bind="value: logfile()"/>
+
+                    </div>
+
+
                 </div>
-
-                <!-- <div class="well small">
-                        <p>
-                            <a class="downloadlogbutton btn btn-mini btn-primary" href="#">Download full log</a>
-
-                        <a class="btn btn-mini btn-warning clearlogbutton">Clear detailed log file</a>
-                    </p>
-                    Detailed log contains <span id="loglength">...</span> items.
-                </div> -->
 
             </div>
     </div>
     <!-- Settings -->
 
+    <a id="quitbutton" class="btn btn-small pull-right" href="">Quit program</a>
     </div>
 </body>
 </html>

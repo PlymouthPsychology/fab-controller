@@ -5,7 +5,7 @@ var socket = io.connect('http://' + document.domain + ':' + location.port);
 // nasty things
 var detailedLog = []
 
-$( document ).ready(function() {
+$(document).ready(function() {
 
     // window.onbeforeunload = function() {
     //   return "Are you sure you want to navigate away? This will delete all logged data for this session.";
@@ -26,7 +26,7 @@ $( document ).ready(function() {
     //data bindings from json which comes in to html elements in the page
     //the first command sets up the model bindings from dummy json.
     var PainDashboardModel = ko.mapping.fromJS(
-        { 'target_R': 0, 'sensor_R': 0, 'target_L': 0, 'sensor_L': 0, 'remaining': null,
+        { 'version': "0.0", 'target_R': 0, 'sensor_R': 0, 'target_L': 0, 'sensor_L': 0, 'remaining': null,
          'steps_from_top_L':0, 'steps_from_top_R':0, 'logfile': 'log.txt'}
     );
     ko.applyBindings(PainDashboardModel);
@@ -43,24 +43,13 @@ $( document ).ready(function() {
 
 
     var add_to_console = function(msg){
-        $('#log tr:first').before('<tr><td>' +msg+'</td></tr>');
+        $('#console p:first').before('<p>' + msg +'</p>');
     }
 
     socket.on('actionlog', function(msg) {
-        add_to_console(msg)
+        add_to_console(msg);
     });
 
-
-    // show how many lines long the log is. Throttle to avoid annoyance in UI
-    _updateloglength = _.throttle(function(){
-        $('#loglength').html(detailedLog.length);
-    }, 5000);
-
-    // append to log when mesages recieved
-    socket.on('log', function(msg) {
-        detailedLog.push(msg);
-        _updateloglength()
-    });
 
     // throttle this because on manual dragging it otherwise slows down
     _setafewconsolemessages = _.throttle(function(){add_to_console("Setting target manually.");}, 1000);
@@ -121,30 +110,40 @@ $( document ).ready(function() {
 
 
     $("#left_pulse_down_button").mousehold(function(i) {
-        add_to_console("Pulse left");
+        add_to_console("Pulse left down");
         socket.emit('manual_pulse', {direction: 'down', hand: 'left', n: 1});
     });
 
     $("#right_pulse_down_button").mousehold(function(i) {
-        add_to_console("Pulse right");
+        add_to_console("Pulse right down");
         socket.emit('manual_pulse', {direction: 'down', hand: 'right', n: 1});
     });
 
     $("#left_pulse_up_button").mousehold(function(i) {
-        add_to_console("Pulse left");
+        add_to_console("Pulse left up");
         socket.emit('manual_pulse', {direction: 'up', hand: 'left', n: 1});
     });
 
     $("#right_pulse_up_button").mousehold(function(i) {
-        add_to_console("Pulse right");
+        add_to_console("Pulse right up");
         socket.emit('manual_pulse', {direction: 'up', hand: 'right', n: 1});
     });
 
-    $("#stopbutton").click(function(){
+    $("#stopbutton").bind('click', function(){
         add_to_console("Stopping everything");
         socket.emit('stopall', {});
         socket.emit('lift_slightly', {});
     });
+
+    
+    $("#quitbutton").bind('click', function(){
+        if (confirm("Quit now?")) {
+            socket.emit('quit', {});
+            window.close();
+            
+        }
+    });
+
 
     $("#return_to_stops_button").click(function(){
         add_to_console("Returning pistons to top stops.")
@@ -166,17 +165,8 @@ $( document ).ready(function() {
     }
 
     $("#logfilename").blur(function(){
-        add_to_console("Updating logfile name")
+        add_to_console("Updating logfile name to " + $("#logfilename").val())
         updatelogfilename();
-    });
-
-
-    $(".clearlogbutton").click(function(){
-        if (confirm("Really delete all log data?") == true) {
-            detailedLog = []
-                    $('#loglength').html(detailedLog.length);
-                    add_to_console("! Clearing logfile.")
-        }
     });
 
 
@@ -200,6 +190,10 @@ $( document ).ready(function() {
     $("#runbutton").click(function(){
         add_to_console("Running program.");
         socket.emit('new_program', { data: $('#prog').val() });
+        return true;
     });
+
+
+    socket.emit('log_session_data', {'message': 'Connected.'});
 
 });

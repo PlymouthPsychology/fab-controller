@@ -2,15 +2,18 @@ import os
 from pip.req import parse_requirements
 from setuptools import setup, find_packages
 
+
+
 reqs = parse_requirements("requirements.txt")
 install_reqs = filter(bool,[str(ir.req) for ir in reqs])
+
 
 setup(
     name='fab-controller',
     author='Ben Whalley',
     author_email='benwhalley@gmail.com',
     url='http://pypi.python.org/pypi/fab-controller/',
-    version='0.9.7',
+    version="0.9.9",
     license='LICENSE.txt',
 
     scripts = ['bin/fab', ],

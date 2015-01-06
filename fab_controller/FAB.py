@@ -350,6 +350,15 @@ def log_session_data(data):
     """Socket handler to write to log from client."""
     return _log_session_data(data)
 
+
+@socketio.on('quit')
+def quit(data):
+    """."""
+    import sys
+    sys.exit()
+
+
+
 @socketio.on('restonfingers')
 def restonfingers(x):
     """Apply just 20g to give a consistent starting point for pre-programmed sessions."""
@@ -442,6 +451,7 @@ def build_log_entry(app):
         'steps_from_top_L': app.left.steps_from_top,
         'steps_from_top_R': app.right.steps_from_top,
         'logfile': app.logfilename,
+        'version': FAB_VERSION,
     }
 
 

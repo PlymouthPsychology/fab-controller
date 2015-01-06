@@ -1,7 +1,10 @@
 import os
 from collections import namedtuple
 import random
+import pkg_resources  # part of setuptools
 
+
+FAB_VERSION = pkg_resources.require("fab_controller")[0].version
 
 HANDS = ['left', 'right']  # We have two hands
 Pair = namedtuple('Pair', HANDS)  # structure used to store values on each hand
