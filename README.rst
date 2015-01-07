@@ -59,7 +59,7 @@ measurements is limited by the resolution of pain self report scales.
 The FAB is designed to resolve all three of these limitations.
 
 
-.. figure:: static/hand.png
+.. figure:: static/hand.png?raw=true
    :alt: An original Forgione Barber device.
 
 
@@ -142,7 +142,7 @@ User guide
 On running the ``fab`` command, a browser window will open containing
 the user interface for the FAB device, shown below.
 
-.. figure:: static/manual.png
+.. figure:: static/manual.png?raw=true
    :alt: The FAB user interface
 
    The FAB user interface
@@ -181,7 +181,7 @@ weight in grams for each hand.
 Programmed control
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-.. figure:: static/programmed.png
+.. figure:: static/programmed.png?raw=true
    :alt: Program interface
 
    Program interface
