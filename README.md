@@ -65,6 +65,87 @@ Note, log files will be saved into `~/Documents/fab/logs/`
 
 
 
+### User guide
+
+
+On running the `fab` command, a browser window will open containing the user interface for the FAB device, shown below.
+
+![The FAB user interface](static/manual.png)
+
+
+The device has 3 primary modes of use:
+
+- Manual control
+- Programmed control
+- Calibration mode
+
+
+#### Target weights and tracking
+
+In both manual and programmed control, the interface distinguishes between:
+
+- Target value for the weight applied to each hand
+- The actual force measurements recorded by the sensor [^actualforce]
+
+^[actualforce] Note that the exact presure applied to the finger will vary as a function of the contact area, and can only be estimated based on the width of the finger, but will be broadly similar between participants.
+
+
+Targets can be set in 'grams' for each hand.  Once a target has been set the control software moves the blades up and down, attempting to maintain the target weight, as measured by the sensor. Thus where participants flex or move their fingers, the system will attempt to compensate to keep the measured force constant.
+
+
+
+#### Manual control
+
+Using the slider controls under the 'manual' tab, you can set a target weight in grams for each hand.
+
+
+
+#### Programmed control
+
+
+![Program interface](static/programmed.png)
+
+Programs for blocks of stimuli can be entered in the text area. Programs are simple lists of comma-separated integers. The first column specifies the duration, the second the target in grams for the left hand, and the third the target for the right hand. So, the following lines:
+
+	`20,500,500`
+	`10,1000,2000`
+
+Denote a program which will deliver 500g to both hands for 20 seconds, and then 1000g to the left and 2000g to the right hands for 10 seconds.
+
+At the end of a program target weights are set to zero.
+
+
+
+#### Get set, Stop and Reset buttons.
+
+- The get set button sets the target for both hands to 20g. This allows a participant to find a comfortable position, and for program to begin from a common reference point.
+- The stop button will always stop any program or manual setting, and reduce the target weights to zero. Additionally, the blades will be moved approx 1mm upwards to give the participant space to move their fingers.
+- The reset button moves both blades to their top resting points.
+
+
+
+
+
+
+
+<!-- ##### Troubleshooting and known issues.
+
+- The software must start in a position where neither blade is activating the top-microswitch. If the switch is depressed on startup the server may hand. The workaround is to remove power from the device and pull both pistons gently downwards.
+
+
+ -->
+
+
+
+
+
+
+
+
+
+
+
+
 <!-- 
 
 Pressure = 980kpa
