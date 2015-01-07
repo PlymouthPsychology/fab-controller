@@ -59,7 +59,7 @@ measurements is limited by the resolution of pain self report scales.
 The FAB is designed to resolve all three of these limitations.
 
 
-.. figure:: static/hand.png?raw=true
+.. figure:: static/hand.jpg?raw=true
    :alt: An original Forgione Barber device.
 
 
