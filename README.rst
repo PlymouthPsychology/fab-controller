@@ -181,7 +181,6 @@ On Windows
 
 
 
--------------------
 
 
 
@@ -306,12 +305,12 @@ By default, log files will be saved into ``~/Documents/fab/logs/``.
 
 
 
--------------------
+
 
 
 
 Troubleshooting and known issues
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------------------
 
 
 
