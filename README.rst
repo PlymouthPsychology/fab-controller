@@ -49,7 +49,7 @@ relatively closely related to the pressure applied, and many studies of
 pain and placebo analgesia use pressure stimuli because they are cheap,
 practical, reliable and have reasonable ecological validity (see Table
 for a comparison of the different types of pain stimulator available).
-a 'Forgione-Barber' can be used to apply pressure to the fingers [@forgione1971strain], see Figure . However, three important
+a 'Forgione-Barber' can be used to apply pressure to the fingers [FORGIONE]_, see Figure . However, three important
 limitations of the original Forgione-Barber device are that i) it is
 impossible to deceive pariticpants as to the true magnitude of the
 stimulus to be delivered, ruling out conditioning studies; ii) it is
@@ -63,6 +63,9 @@ The FAB is designed to resolve all three of these limitations.
    :alt: An original Forgione Barber device.
    :width: 200 px
 
+   An original Forgione Barber device.
+
+
 
 
 The FAB: Hardware
@@ -71,11 +74,45 @@ The FAB: Hardware
 The FAB is based on cheap, readily available hardware (an Arduino
 microcontroller and widely-available pressure-sensors) and the key
 mechanical components are 3D printed and can be assembled by lab
-technicians. Ready-assembled units will also be available to buy.
+technicians. Ready-assembled units are also be available to buy.
 
 More details, including circuit diagrams, schematics, and CAD files
 sufficient to enable 3d-printing and assembly of a device, will be
 available soon under a permissive open source license.
+
+
+The piston
+  The key mechanical component is a 3D-printed piston which contains 2kg of
+  ballast and a linear motor to drive the probe which makes contact with the participants finger.
+  As the linear motor drives the probe downwards and makes contact with the finger
+  the piston is lifted from a rest position, but the maximum weight which can be applied to
+  the probe remains 2kg. 
+
+Arduino microcontroller and sensors
+  An arduino microcontroller is used to drive the linear actuators and capture data from 
+  two load cells mounted within the pistons (between the probe and the motor). These data are fed
+  to a controlling PC via the `Firmata <http://firmata.org/wiki/Main_Page>`_ serial protocol.
+
+
+
+.. figure:: static/piston_300.jpg?raw=true
+   :alt: The FAB piston and probe
+   :width: 200 px
+
+   The FAB piston and probe
+
+
+
+
+.. figure:: static/pistons_long_shot_300.jpg?raw=true
+   :alt: The prototype cabinet and both pistons
+   :width: 200 px
+
+   The prototype cabinet and both pistons
+
+
+
+
 
 
 
@@ -136,6 +173,8 @@ On Windows
 
 2. Repeat the steps above.
 
+
+
 User guide
 ^^^^^^^^^^^^^^^^^^
 
@@ -151,6 +190,8 @@ The device has 3 primary modes of use:
 -  Manual control
 -  Programmed control
 -  Calibration mode
+
+
 
 Target weights and tracking
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -170,6 +211,7 @@ the control software moves the blades up and down, attempting to
 maintain the target weight, as measured by the sensor. Thus where
 participants flex or move their fingers, the system will attempt to
 compensate to keep the measured force constant.
+
 
 
 Manual control
@@ -224,17 +266,13 @@ Get set, Stop and Reset buttons.
 
 
 
-
-
-
 Instructions for participants
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 
-In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that **if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards.
+In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that **if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards**.
 
-
-
+The blades in contact with the participants' fingers are attached using magnets to ensure it will always be possible with only very moderate horzontal force, and it is recommended to demonstrate this feature to participants at the very start of the session.
 
 
 
