@@ -88,13 +88,15 @@ The piston
   ballast and a linear motor to drive the probe which makes contact with the participants finger.
   As the linear motor drives the probe downwards and makes contact with the finger
   the piston is lifted from a rest position, but the maximum weight which can be applied to
-  the probe remains 2kg. 
+  the probe remains 2kg [#grams]_. 
 
 Arduino microcontroller and sensors
   An arduino microcontroller is used to drive the linear actuators and capture data from 
   two load cells mounted within the pistons (between the probe and the motor). These data are fed
   to a controlling PC via the `Firmata <http://firmata.org/wiki/Main_Page>`_ serial protocol.
 
+
+.. [#grams]  Where 1 g = 9.8 mN
 
 
 .. figure:: static/piston_300.jpg?raw=true
@@ -214,15 +216,15 @@ Target weights and tracking
 In both manual and programmed control, the interface distinguishes
 between:
 
--  Target value for the weight applied to each hand.
--  The actual force measurements recorded by the sensor [#actualforce]_.
+-  Target value for the weight[#grams]_  applied to each hand.
+-  The actual measurements recorded by the sensor [#actualforce]_.
 
 
-.. [#actualforce] Note that the exact presure applied to the finger will vary as a function of the contact area, and can only be estimated based on the width of the finger, but will be broadly similar between participants.
+.. [#actualforce] Note that the exact pressure applied to the finger will vary as a function of the contact area, and can only be estimated based on the width of the finger, but will be broadly similar between participants.
 
 
-Targets can be set in 'grams' for each hand. Once a target has been set
-the control software moves the blades up and down, attempting to
+Targets can be set in 'grams' for each hand[#grams]_. Once a target has been set
+the control software moves the probes up and down, attempting to
 maintain the target weight, as measured by the sensor. Thus where
 participants flex or move their fingers, the system will attempt to
 compensate to keep the measured force constant.
@@ -272,10 +274,10 @@ Get set, Stop and Reset buttons.
    a participant to find a comfortable position, and for program to
    begin from a common reference point.
 -  The stop button will always stop any program or manual setting, and
-   reduce the target weights to zero. Additionally, the blades will be
+   reduce the target weights to zero. Additionally, the probes will be
    moved approx 1mm upwards to give the participant space to move their
    fingers.
--  The reset button moves both blades to their top resting points.
+-  The reset button moves both probes to their top resting points.
 
 
 
@@ -288,7 +290,7 @@ Instructions for participants
 .. note:: In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that **if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards**.
 
 
-The blades in contact with the participants' fingers are attached using magnets to ensure it will always be possible with only very moderate horzontal force, and it is recommended to demonstrate this feature to participants at the very start of the session.
+The probes in contact with the participants' fingers are attached using magnets to ensure it will always be possible with only very moderate horzontal force, and it is recommended to demonstrate this feature to participants at the very start of the session.
 
 
 
