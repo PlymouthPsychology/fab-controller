@@ -13,7 +13,7 @@ setup(
     author='Ben Whalley',
     author_email='benwhalley@gmail.com',
     url='http://pypi.python.org/pypi/fab-controller/',
-    version="0.9.9",
+    version="0.9.10",
     license='LICENSE.txt',
 
     scripts = ['bin/fab', ],
@@ -23,7 +23,7 @@ setup(
     include_package_data=True,
     
     description='Control an FAB finger pressure stimulator device.',
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
     
     install_requires=install_reqs,
 )
