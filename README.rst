@@ -2,9 +2,9 @@ FAB! The Forgione-Avent-Barber Finger Pressure Stimulator
 =========================================================
 
 This repository contains the control software for the new
-Forgione-Avent-Barber finger pressure stimulator. Details of the
-original Forgione Barber device [Forgione1971]_ `are
-here <static/ForgioneBarber1971.pdf>`__. The FAB updates this original
+Forgione-Avent-Barber (FAB) finger pressure stimulator. Details of the
+original Forgione Barber (FB) device [Forgione1971]_ `are
+here <static/ForgioneBarber1971.pdf>`__. The FAB updates the original
 design to allow for indepenent computer control of pressure stimulation
 of each hand, allowing for a much greater range of experimental designs
 (e.g. deceptive or conditioned placebo designs).
@@ -49,13 +49,13 @@ relatively closely related to the pressure applied, and many studies of
 pain and placebo analgesia use pressure stimuli because they are cheap,
 practical, reliable and have reasonable ecological validity (see Table
 for a comparison of the different types of pain stimulator available).
-a 'Forgione-Barber' can be used to apply pressure to the fingers [Forgione1971]_, see Figure . However, three important
-limitations of the original Forgione-Barber device are that i) it is
-impossible to deceive pariticpants as to the true magnitude of the
-stimulus to be delivered, ruling out conditioning studies; ii) it is
-impossible to blind experimenters to the stimuli to be delivered (e.g.
-via computer control), and that iii), the reliability of pain
-measurements is limited by the resolution of pain self report scales.
+The FB device is used to apply pressure to the fingers via lever [Forgione1971]_, see figure.  However, three important limitations of the original FB device are that 
+
+1. it is impossible to deceive pariticpants as to the true magnitude of the
+stimulus to be delivered, ruling out conditioning studies
+2. it is impossible to blind experimenters to the stimuli to be delivered (e.g. via computer control), and that 
+3. the reliability of pain measurements is limited by the resolution of pain self report scales.
+
 The FAB is designed to resolve all three of these limitations.
 
 
@@ -103,7 +103,6 @@ Arduino microcontroller and sensors
 
 
 
-
 .. figure:: static/pistons_long_shot_300.jpg?raw=true
    :alt: The prototype cabinet and both pistons
    :width: 200 px
@@ -130,6 +129,8 @@ serial link:
    pre-installed on ready-assembled devices.
 
 
+
+
 Installation
 ^^^^^^^^^^^^^^^^^^
 
@@ -138,11 +139,12 @@ are a recent version of Python plus a C compiler (needed to install the
 python-gevent library).
 
 
-On a Mac,
-,,,,,,,,,,
+
+On OS X (or BSD/Linux)
+,,,,,,,,,,,,,,,,,,,,,,,,,
 
 1. Install XCode from the Mac App Store (you can skip this if you
-   already have a working C compiler on your system).
+   already have a working C compiler on your linux system).
 
 2. Open the Terminal app (in the /Applications/Utilities folder).
 
@@ -158,7 +160,10 @@ On a Mac,
 4. To start using the FAB device, type the command: ``fab``
 
 
-If all is well this will open a web browser window with the interface to the device. 
+.. note: If all is well this will open a web browser window with the interface to the device. 
+
+
+
 
 
 On Windows
@@ -171,6 +176,8 @@ On Windows
 
 
 -------------------
+
+
 
 
 User guide
@@ -283,6 +290,9 @@ Logging and data capture
 By default, log files will be saved into ``~/Documents/fab/logs/``.
 
 
+
+
+-------------------
 
 
 
