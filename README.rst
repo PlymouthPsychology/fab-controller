@@ -268,7 +268,8 @@ Instructions for participants
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 
-In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that **if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards**.
+.. note:: In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that **if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards**.
+
 
 The blades in contact with the participants' fingers are attached using magnets to ensure it will always be possible with only very moderate horzontal force, and it is recommended to demonstrate this feature to participants at the very start of the session.
 
