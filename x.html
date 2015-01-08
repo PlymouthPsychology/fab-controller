@@ -1,17 +1,108 @@
 <h1 id="fab-the-forgione-avent-barber-finger-pressure-stimulator">FAB! The Forgione-Avent-Barber Finger Pressure Stimulator</h1>
-<p>This repository contains the control software for the new Forgione-Avent-Barber finger pressure stimulator. Details of the original Forgione Barber device <a href="static/ForgioneBarber1971.pdf">are here</a>. The FAB updates this original design to allow for indepenent computer control of pressure stimulation of each hand, allowing for a much greater range of experimental designs (e.g. deceptive or conditioned placebo designs).</p>
-<h2 id="background">Background</h2>
-<p>Studies of pain and placebo analgesia have historically used a wide variety of stimuli as laborotory analogues including electrical stimuli [@wager2004placebo], cold water [i.e. a cold pressor; @posner1985effects], heat [@petrovic2002placebo], iontophorensis [@montgomery1997classical], lasers [@bingel2006mechanisms], and pressure [@whalley2008consistency].</p>
+<p>This repository contains the control software for the new Forgione-Avent-Barber (FAB) finger pressure stimulator. Details of the original Forgione Barber (FB) device [Forgione1971]_ <a href="static/ForgioneBarber1971.pdf">are here</a>. The FAB updates the original design to allow for indepenent computer control of pressure stimulation of each hand, allowing for a much greater range of experimental designs (e.g. deceptive or conditioned placebo designs).</p>
+<h2 id="background-and-rationale-for-the-new-design">Background and rationale for the new design</h2>
+<p>Studies of pain and placebo analgesia have historically used a wide variety of stimuli as laborotory analogues including electrical stimuli [Wager2004]_, cold water (i.e. a cold pressor; [Posner1985]_), heat [Ptrovic2002]_, iontophorensis [Montgomery1997]_, lasers [Bingel2006]_, and pressure [Whalley2008]_.</p>
 <p>Pain stimuli for laborotory studies can be evaluated on a number of dimensions: the <em>reliability</em> of the stimuli (in the sense the same stimuli can be delivered consistently); <em>validity</em> of the stimuli, in the sense that it corresponds to real world pain experiences; <em>repeatability</em>, in the sense that multiple stimuli can be given in a single experiment; whether <em>deception</em> is possible --- that is, whether participants can be convincingly misinformed about the stimuli to be delivered (this would, for exaple, allow placebo-conditioning studies to take place, e.g. @montgomery1997classical); and the <em>expense</em> and <em>practicality</em> of the techniques — for example whether the equipment can be used by students without additional supervision.</p>
-<p>| Stimuli | Reliablity | Validity | Repeatable | Deception | Blinding | Expense | Practical | +------------------+------------+----------+------------+-----------+----------+---------+-----------+ | <em>Heat</em> | Good | Good | Yes | Yes | Yes | High | Yes | | <em>Cold</em> | Moderate | Good | No | No | No | Low | Yes | | <em>Iontophorensis</em> | Yes | Poor | Yes | Yes | Yes | NA | NA | | <em>Electrical</em> | Good | Poor | Yes | Yes | Yes | Med | Yes | | <em>Laser</em> | Good | Poor | Yes | Yes | Yes | High | No | | <em>Focal pressure</em> | Moderate | Good | Yes | No | No | Low | Yes |</p>
-<p>Focal pressure, applied to the skin over bone, is a method of evoking experimental pain of an 'aching' nature. The experienced sensation is relatively closely related to the pressure applied, and many studies of pain and placebo analgesia use pressure stimuli because they are cheap, practical, reliable and have reasonable ecological validity (see Table for a comparison of the different types of pain stimulator available). a 'Forgione-Barber' can be used to apply pressure to the fingers [@forgione1971strain], see Figure . However, three important limitations of the original Forgione-Barber device are that i) it is impossible to deceive pariticpants as to the true magnitude of the stimulus to be delivered, ruling out conditioning studies; ii) it is impossible to blind experimenters to the stimuli to be delivered (e.g. via computer control), and that iii), the reliability of pain measurements is limited by the resolution of pain self report scales. The FAB is designed to resolve all three of these limitations.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Stimuli</th>
+<th align="left">Reliablity</th>
+<th align="left">Validity</th>
+<th align="left">Repeatable</th>
+<th align="left">Deception</th>
+<th align="left">Blinding</th>
+<th align="left">Expense</th>
+<th align="left">Practical</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><em>Heat</em></td>
+<td align="left">Good</td>
+<td align="left">Good</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">High</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left"><em>Cold</em></td>
+<td align="left">Moderate</td>
+<td align="left">Good</td>
+<td align="left">No</td>
+<td align="left">No</td>
+<td align="left">No</td>
+<td align="left">Low</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>Iontophorensis</em></td>
+<td align="left">Yes</td>
+<td align="left">Poor</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">NA</td>
+<td align="left">NA</td>
+</tr>
+<tr class="even">
+<td align="left"><em>Electrical</em></td>
+<td align="left">Good</td>
+<td align="left">Poor</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">Med</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left"><em>Laser</em></td>
+<td align="left">Good</td>
+<td align="left">Poor</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">High</td>
+<td align="left">No</td>
+</tr>
+<tr class="even">
+<td align="left"><em>Focal pressure</em></td>
+<td align="left">Moderate</td>
+<td align="left">Good</td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+<td align="left">No</td>
+<td align="left">Low</td>
+<td align="left">Yes</td>
+</tr>
+</tbody>
+</table>
+<p>Focal pressure, applied to the skin over bone, is a method of evoking experimental pain of an 'aching' nature. The experienced sensation is relatively closely related to the pressure applied, and many studies of pain and placebo analgesia use pressure stimuli because they are cheap, practical, reliable and have reasonable ecological validity (see Table for a comparison of the different types of pain stimulator available). The FB device is used to apply pressure to the fingers via lever [Forgione1971]_, see figure. However, three important limitations of the original FB device are that</p>
+<p>1. it is impossible to deceive pariticpants as to the true magnitude of the stimulus to be delivered, ruling out conditioning studies 2. it is impossible to blind experimenters to the stimuli to be delivered (e.g. via computer control), and that 3. the reliability of pain measurements is limited by the resolution of pain self report scales.</p>
+<p>The FAB is designed to resolve all three of these limitations.</p>
 <div class="figure">
-<img src="static/hand.jpg?raw=true" />
+<img src="static/hand_300.jpg?raw=true" alt="An original Forgione Barber device." /><p class="caption">An original Forgione Barber device.</p>
 </div>
 <h3 id="the-fab-hardware">The FAB: Hardware</h3>
-<p>The FAB is based on cheap, readily available hardware (an Arduino microcontroller and widely-available pressure-sensors) and the key mechanical components are 3D printed and can be assembled by lab technicians. Ready-assembled units will also be available to buy.</p>
+<p>The FAB is based on cheap, readily available hardware (an Arduino microcontroller and widely-available pressure-sensors) and the key mechanical components are 3D printed and can be assembled by lab technicians. Ready-assembled units are also be available to buy.</p>
 <p>More details, including circuit diagrams, schematics, and CAD files sufficient to enable 3d-printing and assembly of a device, will be available soon under a permissive open source license.</p>
-<h3 id="fab-software">FAB Software</h3>
+<dl>
+<dt>The piston</dt>
+<dd><p>The key mechanical component is a 3D-printed piston which contains 2kg of ballast and a linear motor to drive the probe which makes contact with the participants finger. As the linear motor drives the probe downwards and makes contact with the finger the piston is lifted from a rest position, but the maximum weight which can be applied to the probe remains 2kg.</p>
+</dd>
+<dt>Arduino microcontroller and sensors</dt>
+<dd><p>An arduino microcontroller is used to drive the linear actuators and capture data from two load cells mounted within the pistons (between the probe and the motor). These data are fed to a controlling PC via the <a href="http://firmata.org/wiki/Main_Page">Firmata</a> serial protocol.</p>
+</dd>
+</dl>
+<div class="figure">
+<img src="static/piston_300.jpg?raw=true" alt="The FAB piston and probe" /><p class="caption">The FAB piston and probe</p>
+</div>
+<div class="figure">
+<img src="static/pistons_long_shot_300.jpg?raw=true" alt="The prototype cabinet and both pistons" /><p class="caption">The prototype cabinet and both pistons</p>
+</div>
+<h3 id="software">Software</h3>
 <p>The system includes two software components which communicate via a USB serial link:</p>
 <ul>
 <li>This control software, which runs on a host computer and provides a user interface via a web browser.</li>
@@ -19,32 +110,29 @@
 </ul>
 <h4 id="installation">Installation</h4>
 <p>The software should work on both Mac and PC - the primary dependencies are a recent version of Python plus a C compiler (needed to install the python-gevent library).</p>
-<h5 id="on-a-mac">On a Mac,</h5>
+<h5 id="on-os-x-or-bsdlinux">On OS X (or BSD/Linux)</h5>
 <ol style="list-style-type: decimal">
-<li>Install XCode from the Mac App Store (you can skip this if you already have a working C compiler on your system).</li>
+<li>Install XCode from the Mac App Store (you can skip this if you already have a working C compiler on your linux system).</li>
 <li>Open the Terminal app (in the /Applications/Utilities folder).</li>
-<li><p>If you don't already have <a href="https://pypi.python.org/pypi/pip">pip</a> installed, type</p>
-<blockquote>
-<p><code>sudo easy_install pip</code></p>
-</blockquote></li>
+<li>If you don't already have <a href="https://pypi.python.org/pypi/pip">pip</a> installed, type <code>sudo easy_install pip</code></li>
 </ol>
 <blockquote>
-<p>And then to install the software:</p>
-<blockquote>
-<p><code>pip install fab-controller</code></p>
-</blockquote>
+<p>And then to install the software: <code>pip install fab-controller</code></p>
 </blockquote>
 <ol start="4" style="list-style-type: decimal">
-<li>To start using the FAB device, type the command:</li>
+<li>To start using the FAB device, type the command: <code>fab</code></li>
 </ol>
-<p><code>fab</code></p>
-<p>If all is well this will show a few initialisation messages, and then open a web browser window with the interface to the device.</p>
 <h5 id="on-windows">On Windows</h5>
 <ol style="list-style-type: decimal">
 <li>Ensure you have GCC, Python and pip installed.</li>
 <li>Repeat the steps above.</li>
 </ol>
-<h4 id="user-guide">User guide</h4>
+<h2 id="user-guide">User guide</h2>
+<h4 id="getting-started">Getting started</h4>
+<ol style="list-style-type: decimal">
+<li>Connect both the DC power input and the USB cables.</li>
+<li>Run the <code>fab</code> command from the Terminal.</li>
+</ol>
 <p>On running the <code>fab</code> command, a browser window will open containing the user interface for the FAB device, shown below.</p>
 <div class="figure">
 <img src="static/manual.png?raw=true" alt="The FAB user interface" /><p class="caption">The FAB user interface</p>
@@ -72,8 +160,8 @@
 <img src="static/programmed.png?raw=true" />
 </div>
 <p>Programs for blocks of stimuli can be entered in the text area. Programs are simple lists of comma-separated integers. The first column specifies the duration, the second the target in grams for the left hand, and the third the target for the right hand. So, the following lines:</p>
-<pre><code>`20,500,500`
-`10,1000,2000`</code></pre>
+<pre><code>20,500,500
+10,1000,2000</code></pre>
 <p>Denote a program which will deliver 500g to both hands for 20 seconds, and then 1000g to the left and 2000g to the right hands for 10 seconds.</p>
 <p>At the end of a program target weights are set to zero.</p>
 <h5 id="get-set-stop-and-reset-buttons.">Get set, Stop and Reset buttons.</h5>
@@ -82,10 +170,20 @@
 <li>The stop button will always stop any program or manual setting, and reduce the target weights to zero. Additionally, the blades will be moved approx 1mm upwards to give the participant space to move their fingers.</li>
 <li>The reset button moves both blades to their top resting points.</li>
 </ul>
+<h5 id="instructions-for-participants">Instructions for participants</h5>
+<blockquote>
+<p><strong>note</strong></p>
+<p>In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that <strong>if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards</strong>.</p>
+</blockquote>
+<p>The blades in contact with the participants' fingers are attached using magnets to ensure it will always be possible with only very moderate horzontal force, and it is recommended to demonstrate this feature to participants at the very start of the session.</p>
 <h5 id="logging-and-data-capture">Logging and data capture</h5>
 <p>By default, log files will be saved into <code>~/Documents/fab/logs/</code>.</p>
-<h5 id="troubleshooting-and-known-issues">Troubleshooting and known issues</h5>
-<p>Software hangs on start: The device must start in a position where neither piston is activating the top-stop micro-switch. If the switch is depressed on startup the server may hang. The workaround is to remove power from the device and pull both pistons gently downwards approx 3 mm.</p>
+<h2 id="troubleshooting-and-known-issues">Troubleshooting and known issues</h2>
+<dl>
+<dt>Software hangs on start-up</dt>
+<dd><p>The device must start in a position where neither piston is activating the top-stop micro-switch. If the switch is depressed on startup the server may hang. The workaround is to remove power from the device and pull both pistons gently downwards approx 3 mm.</p>
+</dd>
+</dl>
 <div class="footnotes">
 <hr />
 <ol>
