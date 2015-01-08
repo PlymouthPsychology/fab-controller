@@ -146,24 +146,19 @@ On a Mac,
 
 2. Open the Terminal app (in the /Applications/Utilities folder).
 
-3. If you don't already have pip_ installed, type
+3. If you don't already have pip_ installed, type ``sudo easy_install pip``
 
 
 .. _pip: https://pypi.python.org/pypi/pip
 
-    ``sudo easy_install pip``
 
-  And then to install the software:
-
-    ``pip install fab-controller``
+  And then to install the software: ``pip install fab-controller``
 
 
-4. To start using the FAB device, type the command:
-
-``fab``
+4. To start using the FAB device, type the command: ``fab``
 
 
-If all is well this will show a few initialisation messages, and then open a web browser window with the interface to the device. 
+If all is well this will open a web browser window with the interface to the device. 
 
 
 On Windows
@@ -173,6 +168,9 @@ On Windows
 
 2. Repeat the steps above.
 
+
+
+-------------------
 
 
 User guide
@@ -240,8 +238,8 @@ third the target for the right hand. So, the following lines:
 
 ::
 
-    `20,500,500`
-    `10,1000,2000`
+    20,500,500
+    10,1000,2000
 
 Denote a program which will deliver 500g to both hands for 20 seconds,
 and then 1000g to the left and 2000g to the right hands for 10 seconds.
@@ -288,7 +286,7 @@ By default, log files will be saved into ``~/Documents/fab/logs/``.
 
 
 Troubleshooting and known issues
-,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
 
