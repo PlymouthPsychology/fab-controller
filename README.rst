@@ -3,7 +3,7 @@ FAB! The Forgione-Avent-Barber Finger Pressure Stimulator
 
 This repository contains the control software for the new
 Forgione-Avent-Barber finger pressure stimulator. Details of the
-original Forgione Barber device `are
+original Forgione Barber device [FORGIONE]_ `are
 here <static/ForgioneBarber1971.pdf>`__. The FAB updates this original
 design to allow for indepenent computer control of pressure stimulation
 of each hand, allowing for a much greater range of experimental designs
@@ -11,15 +11,15 @@ of each hand, allowing for a much greater range of experimental designs
 
 
 
-Background
-----------
+Background and rationale for the new design
+--------------------------------------------------
 
 Studies of pain and placebo analgesia have historically used a wide
 variety of stimuli as laborotory analogues including electrical stimuli
-[@wager2004placebo], cold water [i.e. a cold pressor;
-@posner1985effects], heat [@petrovic2002placebo], iontophorensis
-[@montgomery1997classical], lasers [@bingel2006mechanisms], and pressure
-[@whalley2008consistency].
+[WAGER]_, cold water [i.e. a cold pressor;
+@posner1985effects], heat [PETROVIC]_, iontophorensis
+[MONTGOMERY]_, lasers [BINGEL]_, and pressure
+[WHALLEY]_.
 
 Pain stimuli for laborotory studies can be evaluated on a number of
 dimensions: the *reliability* of the stimuli (in the sense the same stimuli
@@ -61,7 +61,7 @@ The FAB is designed to resolve all three of these limitations.
 
 .. figure:: static/hand.jpg?raw=true
    :alt: An original Forgione Barber device.
-
+   :width: 200 px
 
 
 
@@ -109,25 +109,25 @@ On a Mac,
 
 2. Open the Terminal app (in the /Applications/Utilities folder).
 
-3. If you don't already have
-   ```pip`` <https://pypi.python.org/pypi/pip>`__ installed, type:
+3. If you don't already have pip_ installed, type
 
-   ``sudo easy_install pip``
 
-And then to install the software:
+.. _pip: https://pypi.python.org/pypi/pip
 
-::
+    ``sudo easy_install pip``
 
-    `pip install fab-controller`
+  And then to install the software:
 
-4. To run the machine, type the command:
+    ``pip install fab-controller``
 
-   ``fab``
 
-This should then show a few initialisation messages, and open a web
-browser window with the interface to the device.
+4. To start using the FAB device, type the command:
 
-Note, log files will be saved into ``~/Documents/fab/logs/``
+``fab``
+
+
+If all is well this will show a few initialisation messages, and then open a web browser window with the interface to the device. 
+
 
 On Windows
 ,,,,,,,,,,,,,
@@ -158,18 +158,19 @@ Target weights and tracking
 In both manual and programmed control, the interface distinguishes
 between:
 
--  Target value for the weight applied to each hand
--  The actual force measurements recorded by the sensor [^actualforce]
+-  Target value for the weight applied to each hand.
+-  The actual force measurements recorded by the sensor [#actualforce]_.
 
- [1]_ Note that the exact presure applied to the finger will vary as a
-function of the contact area, and can only be estimated based on the
-width of the finger, but will be broadly similar between participants.
+
+.. [#actualforce] Note that the exact presure applied to the finger will vary as a function of the contact area, and can only be estimated based on the width of the finger, but will be broadly similar between participants.
+
 
 Targets can be set in 'grams' for each hand. Once a target has been set
 the control software moves the blades up and down, attempting to
 maintain the target weight, as measured by the sensor. Thus where
 participants flex or move their fingers, the system will attempt to
 compensate to keep the measured force constant.
+
 
 Manual control
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
@@ -178,13 +179,18 @@ Using the slider controls under the 'manual' tab, you can set a target
 weight in grams for each hand.
 
 
+.. figure:: static/manual.png?raw=true
+   :alt: Manual control interface
+
+
+
 Programmed control
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 .. figure:: static/programmed.png?raw=true
    :alt: Program interface
 
-   Program interface
+
 Programs for blocks of stimuli can be entered in the text area. Programs
 are simple lists of comma-separated integers. The first column specifies
 the duration, the second the target in grams for the left hand, and the
@@ -217,9 +223,42 @@ Get set, Stop and Reset buttons.
 
 
 
-.. ##### Troubleshooting and known issues.
 
-.. - The software must start in a position where neither blade is activating the top-microswitch. If the switch is depressed on startup the server may hand. The workaround is to remove power from the device and pull both pistons gently downwards.
+
+
+
+Instructions for participants
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+
+In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that **if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards.
+
+
+
+
+
+
+
+
+Logging and data capture
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+By default, log files will be saved into ``~/Documents/fab/logs/``.
+
+
+
+
+
+Troubleshooting and known issues
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+
+
+
+Software hangs on start-up
+  The device must start in a position where neither piston is activating the top-stop micro-switch. If the switch is depressed on startup the server may hang. The workaround is to remove power from the device and pull both pistons gently downwards approx 3 mm.
+
+
+
 
 
 .. Pressure = 980kpa
@@ -227,3 +266,31 @@ Get set, Stop and Reset buttons.
 .. ( 19.6/ (.002*.01)  )/1000
 
 .. Could be between 816 and 1225 kpa depending on width of contact spot
+
+
+
+
+
+
+
+
+
+.. [BINGEL] Bingel, Ulrike, Jürgen Lorenz, Eszter Schoell, Cornelius Weiller, and Christian Büchel. 2006. “Mechanisms of Placebo Analgesia: RACC Recruitment of a Subcortical Antinociceptive Network.” Pain 120 (1): 8–15.
+
+.. [FORGIONE] Forgione, Albert G, and Theodore X Barber. 1971. “A Strain Gauge Pain Stimulator.” Psychophysiology 8 (1): 102–106.
+
+.. [MONTGOMERY] Montgomery, Guy H, and Irving Kirsch. 1997. “Classical Conditioning and the Placebo Effect.” Pain 72 (1): 107–113.
+
+.. [PETROVIC] Petrovic, Predrag, Eija Kalso, Karl Magnus Petersson, and Martin Ingvar. 2002. “Placebo and Opioid Analgesia–Imaging a Shared Neuronal Network.” Science 295 (5560): 1737–1740.
+
+.. [POSNER] Posner, John, Andras Telekes, Dominic Crowley, Richard Phillipson, and Anthony W Peck. 1985. “Effects of an Opiate on Cold-Induced Pain and the CNS in Healthy Volunteers.” Pain 23 (1): 73–82.
+
+.. [TREUTWEIN] Treutwein, Bernhard. 1995. “Adaptive Psychophysical Procedures.” Vision Research 35 (17): 2503–2522.
+
+.. [WAGER] Wager, Tor D, James K Rilling, Edward E Smith, Alex Sokolik, Kenneth L Casey, Richard J Davidson, Stephen M Kosslyn, Robert M Rose, and Jonathan D Cohen. 2004. “Placebo-Induced Changes in FMRI in the Anticipation and Experience of Pain.” Science 303 (5661): 1162–1167.
+
+.. [WHALLEY] Whalley, Ben, Michael E Hyland, and Irving Kirsch. 2008. “Consistency of the Placebo Effect.” Journal of Psychosomatic Research 64 (5): 537–541.
+
+
+
+
