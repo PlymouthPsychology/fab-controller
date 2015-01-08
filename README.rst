@@ -59,7 +59,7 @@ measurements is limited by the resolution of pain self report scales.
 The FAB is designed to resolve all three of these limitations.
 
 
-.. figure:: static/hand.jpg?raw=true
+.. figure:: static/hand_300.jpg?raw=true
    :alt: An original Forgione Barber device.
    :width: 200 px
 
@@ -116,7 +116,7 @@ Arduino microcontroller and sensors
 
 
 
-FAB Software
+Software
 ~~~~~~~~~~~~
 
 The system includes two software components which communicate via a USB
