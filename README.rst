@@ -301,8 +301,7 @@ Logging and data capture
 
 By default, log files will be saved into ``~/Documents/fab/logs/``.
 
-
-
+The current log file name change be changed (e.g. per-participant) in the 'Detailed Log' tab, next to the console.
 
 
 
