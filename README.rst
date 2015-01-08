@@ -3,7 +3,7 @@ FAB! The Forgione-Avent-Barber Finger Pressure Stimulator
 
 This repository contains the control software for the new
 Forgione-Avent-Barber finger pressure stimulator. Details of the
-original Forgione Barber device [FORGIONE]_ `are
+original Forgione Barber device [Forgione1971]_ `are
 here <static/ForgioneBarber1971.pdf>`__. The FAB updates this original
 design to allow for indepenent computer control of pressure stimulation
 of each hand, allowing for a much greater range of experimental designs
@@ -16,10 +16,10 @@ Background and rationale for the new design
 
 Studies of pain and placebo analgesia have historically used a wide
 variety of stimuli as laborotory analogues including electrical stimuli
-[WAGER]_, cold water [i.e. a cold pressor;
-@posner1985effects], heat [PETROVIC]_, iontophorensis
-[MONTGOMERY]_, lasers [BINGEL]_, and pressure
-[WHALLEY]_.
+[Wager2004]_, cold water (i.e. a cold pressor;
+[Posner1985]_), heat [Ptrovic2002]_, iontophorensis
+[Montgomery1997]_, lasers [Bingel2006]_, and pressure
+[Whalley2008]_.
 
 Pain stimuli for laborotory studies can be evaluated on a number of
 dimensions: the *reliability* of the stimuli (in the sense the same stimuli
@@ -49,7 +49,7 @@ relatively closely related to the pressure applied, and many studies of
 pain and placebo analgesia use pressure stimuli because they are cheap,
 practical, reliable and have reasonable ecological validity (see Table
 for a comparison of the different types of pain stimulator available).
-a 'Forgione-Barber' can be used to apply pressure to the fingers [FORGIONE]_, see Figure . However, three important
+a 'Forgione-Barber' can be used to apply pressure to the fingers [Forgione1971]_, see Figure . However, three important
 limitations of the original Forgione-Barber device are that i) it is
 impossible to deceive pariticpants as to the true magnitude of the
 stimulus to be delivered, ruling out conditioning studies; ii) it is
@@ -311,21 +311,21 @@ Software hangs on start-up
 
 
 
-.. [BINGEL] Bingel, Ulrike, Jürgen Lorenz, Eszter Schoell, Cornelius Weiller, and Christian Büchel. 2006. “Mechanisms of Placebo Analgesia: RACC Recruitment of a Subcortical Antinociceptive Network.” Pain 120 (1): 8–15.
+.. [Bingel2006] Bingel, Ulrike, Jürgen Lorenz, Eszter Schoell, Cornelius Weiller, and Christian Büchel. 2006. “Mechanisms of Placebo Analgesia: RACC Recruitment of a Subcortical Antinociceptive Network.” Pain 120 (1): 8–15.
 
-.. [FORGIONE] Forgione, Albert G, and Theodore X Barber. 1971. “A Strain Gauge Pain Stimulator.” Psychophysiology 8 (1): 102–106.
+.. [Forgione1971] Forgione, Albert G, and Theodore X Barber. 1971. “A Strain Gauge Pain Stimulator.” Psychophysiology 8 (1): 102–106.
 
-.. [MONTGOMERY] Montgomery, Guy H, and Irving Kirsch. 1997. “Classical Conditioning and the Placebo Effect.” Pain 72 (1): 107–113.
+.. [Montgomery1997] Montgomery, Guy H, and Irving Kirsch. 1997. “Classical Conditioning and the Placebo Effect.” Pain 72 (1): 107–113.
 
-.. [PETROVIC] Petrovic, Predrag, Eija Kalso, Karl Magnus Petersson, and Martin Ingvar. 2002. “Placebo and Opioid Analgesia–Imaging a Shared Neuronal Network.” Science 295 (5560): 1737–1740.
+.. [Ptrovic2002] Petrovic, Predrag, Eija Kalso, Karl Magnus Petersson, and Martin Ingvar. 2002. “Placebo and Opioid Analgesia–Imaging a Shared Neuronal Network.” Science 295 (5560): 1737–1740.
 
-.. [POSNER] Posner, John, Andras Telekes, Dominic Crowley, Richard Phillipson, and Anthony W Peck. 1985. “Effects of an Opiate on Cold-Induced Pain and the CNS in Healthy Volunteers.” Pain 23 (1): 73–82.
+.. [Posner1985] Posner, John, Andras Telekes, Dominic Crowley, Richard Phillipson, and Anthony W Peck. 1985. “Effects of an Opiate on Cold-Induced Pain and the CNS in Healthy Volunteers.” Pain 23 (1): 73–82.
 
-.. [TREUTWEIN] Treutwein, Bernhard. 1995. “Adaptive Psychophysical Procedures.” Vision Research 35 (17): 2503–2522.
+.. [Treutwein1995] Treutwein, Bernhard. 1995. “Adaptive Psychophysical Procedures.” Vision Research 35 (17): 2503–2522.
 
-.. [WAGER] Wager, Tor D, James K Rilling, Edward E Smith, Alex Sokolik, Kenneth L Casey, Richard J Davidson, Stephen M Kosslyn, Robert M Rose, and Jonathan D Cohen. 2004. “Placebo-Induced Changes in FMRI in the Anticipation and Experience of Pain.” Science 303 (5661): 1162–1167.
+.. [Wager2004] Wager, Tor D, James K Rilling, Edward E Smith, Alex Sokolik, Kenneth L Casey, Richard J Davidson, Stephen M Kosslyn, Robert M Rose, and Jonathan D Cohen. 2004. “Placebo-Induced Changes in FMRI in the Anticipation and Experience of Pain.” Science 303 (5661): 1162–1167.
 
-.. [WHALLEY] Whalley, Ben, Michael E Hyland, and Irving Kirsch. 2008. “Consistency of the Placebo Effect.” Journal of Psychosomatic Research 64 (5): 537–541.
+.. [Whalley2008] Whalley, Ben, Michael E Hyland, and Irving Kirsch. 2008. “Consistency of the Placebo Effect.” Journal of Psychosomatic Research 64 (5): 537–541.
 
 
 
