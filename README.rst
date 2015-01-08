@@ -11,6 +11,11 @@ of each hand, allowing for a much greater range of experimental designs
 
 
 
+.. contents::
+
+
+
+
 Background and rationale for the new design
 --------------------------------------------------
 
@@ -175,13 +180,22 @@ On Windows
 
 
 
+
 -------------------
 
 
 
-
 User guide
+-------------------
+
+
+
+Getting started
 ^^^^^^^^^^^^^^^^^^
+
+1. Connect both the DC power input and the USB cables.
+2. Run the ``fab`` command from the Terminal.
+
 
 On running the ``fab`` command, a browser window will open containing
 the user interface for the FAB device, shown below.
