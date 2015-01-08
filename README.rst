@@ -13,9 +13,6 @@ of each hand, allowing for a much greater range of experimental designs
 
 
 
-
-
-
 Background and rationale for the new design
 --------------------------------------------------
 
