@@ -31,16 +31,16 @@ convincingly misinformed about the stimuli to be delivered (this would, for exap
 the *expense* and *practicality* of the techniques — for example whether
 the equipment can be used by students without additional supervision.
 
-
-|     Stimuli      | Reliablity | Validity | Repeatable | Deception | Blinding | Expense | Practical |
-+------------------+------------+----------+------------+-----------+----------+---------+-----------+
-| *Heat*           | Good       | Good     | Yes        | Yes       | Yes      | High    | Yes       |
-| *Cold*           | Moderate   | Good     | No         | No        | No       | Low     | Yes       |
-| *Iontophorensis* | Yes        | Poor     | Yes        | Yes       | Yes      | NA      | NA        |
-| *Electrical*     | Good       | Poor     | Yes        | Yes       | Yes      | Med     | Yes       |
-| *Laser*          | Good       | Poor     | Yes        | Yes       | Yes      | High    | No        |
-| *Focal pressure* | Moderate   | Good     | Yes        | No        | No       | Low     | Yes       |
-
+==================   ============   ==========    ============    ===========   ==========    =========   ===========
+     Stimuli          Reliablity     Validity      Repeatable      Deception     Blinding      Expense     Practical 
+------------------   ------------   ----------    ------------    -----------   ----------    ---------   -----------
+ *Heat*               Good           Good          Yes             Yes           Yes           High        Yes       
+ *Cold*               Moderate       Good          No              No            No            Low         Yes       
+ *Iontophorensis*     Yes            Poor          Yes             Yes           Yes           NA          NA        
+ *Electrical*         Good           Poor          Yes             Yes           Yes           Med         Yes       
+ *Laser*              Good           Poor          Yes             Yes           Yes           High        No        
+ *Focal pressure*     Moderate       Good          Yes             No            No            Low         Yes       
+==================   ============   ==========    ============    ===========   ==========    =========   ===========
 
 
 Focal pressure, applied to the skin over bone, is a method of evoking
