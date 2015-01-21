@@ -362,8 +362,8 @@ def quit(data):
 @socketio.on('restonfingers')
 def restonfingers(x):
     """Apply just 20g to give a consistent starting point for pre-programmed sessions."""
-    app.left.target = 20
-    app.right.target = 20
+    app.left.target = 50
+    app.right.target = 50
     _log_session_data({'message': "Resting on fingers"})
 
 @socketio.on('toggle_tracking')

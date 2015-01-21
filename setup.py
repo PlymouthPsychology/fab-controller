@@ -13,7 +13,7 @@ setup(
     author='Ben Whalley',
     author_email='benwhalley@gmail.com',
     url='http://pypi.python.org/pypi/fab-controller/',
-    version="0.9.11",
+    version="0.9.12",
     license='LICENSE.txt',
 
     scripts = ['bin/fab', ],
