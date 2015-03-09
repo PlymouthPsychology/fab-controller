@@ -1,4 +1,4 @@
-#! python
+#!/usr/bin/env python
 
 from fab_controller.FAB import *
 import os
