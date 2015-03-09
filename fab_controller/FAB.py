@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import functools
 import json
 import webbrowser
 from collections import deque
@@ -16,8 +17,6 @@ from flask_socketio import SocketIO, send, emit
 import gevent
 from settings import *
 
-
-print SERVER_PORT
 
 def get_arduino_name():
     """Tries to find an Arduino acting as a usb modem. If multiple
@@ -73,7 +72,6 @@ def signal_handler(signal, frame):
 signal.signal(signal.SIGINT, signal_handler)
 
 
-
 # Build a dictionary of the pins on the actual board from our settings file.
 print("Setting up pins")
 live_pins = {
@@ -98,39 +96,48 @@ live_pins['left']['sensor_pin'].enable_reporting()
 live_pins['right']['sensor_pin'].enable_reporting()
 
 
-print("Checking switches...")
 
 
-while True:
-    gevent.sleep(.1)
-    l, r = live_pins['left']['high_limit_pin'].read(), live_pins['right']['high_limit_pin'].read()
-    if l is not None and r is not None:  # test for not None because switch could be false at startup
-        print("found top limit switches.")
-        print("left is", l)
-        print("right is", r)
-        break
-
-while True:
-    gevent.sleep(.1)
-    l, r = live_pins['left']['low_limit_pin'].read(), live_pins['right']['low_limit_pin'].read()
-    if l is not None and r is not None:  # test for not None because switch could be false at startup
-        print("found bottom limit switches.")
-        print("left is", l)
-        print("right is", r)
-        break
+# this could be moved into the Crusher init function.
+print("Checking switches and sensors are live...")
 
 
-print("Checking sensors...")
-while True:
-    gevent.sleep(.1)
-    if live_pins['left']['sensor_pin'].read() and live_pins['right']['sensor_pin'].read():
-        print("found sensors.")
-        break
+
+def check_pin(pin, hand=None):
+    # range for loop specifies max tries or steps down before giving up 
+    for i in xrange(1000):
+        if pin.read() is not None:
+            return True
+        if hand:
+            # this logic is because depressed switches read None forever
+            live_pins[hand]['direction_pin'].write(DOWN)
+            live_pins[hand]['step_pin'].write(1)
+            gevent.sleep(STEP_DELAY)
+            live_pins[hand]['step_pin'].write(0)
+            gevent.sleep(STEP_DELAY)
+
+        gevent.sleep(STEP_DELAY)
+
+    raise Exception("{} cannot be recognised".format(pin))
+
+
+# checking switches and sensors can be read
+gevent.joinall([
+            gevent.spawn(check_pin, live_pins['left']['high_limit_pin'], hand="left"),
+            gevent.spawn(check_pin, live_pins['right']['high_limit_pin'], hand="right"),
+            gevent.spawn(check_pin, live_pins['left']['sensor_pin']),
+            gevent.spawn(check_pin, live_pins['right']['sensor_pin']),
+        ], 
+    timeout=15, 
+    raise_error=True
+)
 
 
 # scale a value in range (a,b) to corresponding value in range (c,d)
 scale_range = lambda x, OldMin, OldMax, NewMin, NewMax: \
     (((x - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+
+
 
 
 class Crusher(object):
