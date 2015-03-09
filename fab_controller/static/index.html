@@ -29,9 +29,9 @@
             </div>
             <div class="span4">
                 <hr>
-                    <a id="getsetbutton" class="btn btn-large" href="#">Get Set</a>
-                    <a id="stopbutton" class="btn btn-large btn-danger"  href="#">Stop</a>
-                    <a id="return_to_stops_button"  class="btn btn-large btn-success"  href="#">Reset</a>
+                    <button id="getsetbutton" class="btn btn-large" href="#">Get Set</button>
+                    <button id="stopbutton" class="btn btn-large btn-danger"  href="#">Stop</button>
+                    <button id="return_to_stops_button"  class="btn btn-large btn-success"  href="#">Reset</button>
 
              <h5 data-bind="visible: remaining() != null">Program time remaining: <span data-bind="text: remaining"></span></h5>
             
@@ -100,7 +100,7 @@
                         <p>
                             <button id="runbutton" class="btn btn-success" data-bind="enable: remaining() === null">Run program</button>
 
-                            <a href="#" class="btn" data-toggle="modal" data-target="#myModal">Help</a>
+                            <button href="#" class="btn" data-toggle="modal" data-target="#myModal">Help</button>
                         </p>
                         <hr>
 
@@ -192,7 +192,7 @@
     </div>
     <!-- Settings -->
 
-    <a id="quitbutton" class="btn btn-small pull-right" href="">Quit program</a>
+    <button id="quitbutton" class="btn btn-small pull-right" href="">Quit program</button>
     </div>
 </body>
 </html>
