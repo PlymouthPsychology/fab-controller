@@ -29,7 +29,8 @@ can be delivered consistently); *validity* of the stimuli, in the sense
 that it corresponds to real world pain experiences; *repeatability*, in
 the sense that multiple stimuli can be given in a single experiment;
 whether *deception* is possible --- that is, whether participants can be
-convincingly misinformed about the stimuli to be delivered (this would, for exaple, allow placebo-conditioning studies to take place, e.g. @montgomery1997classical); and
+convincingly misinformed about the stimuli to be delivered (this would, for exaple, 
+allow placebo-conditioning studies to take place, e.g. [Montgomery1997]_; and
 the *expense* and *practicality* of the techniques — for example whether
 the equipment can be used by students without additional supervision.
 
