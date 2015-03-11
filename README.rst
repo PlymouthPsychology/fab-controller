@@ -29,7 +29,8 @@ can be delivered consistently); *validity* of the stimuli, in the sense
 that it corresponds to real world pain experiences; *repeatability*, in
 the sense that multiple stimuli can be given in a single experiment;
 whether *deception* is possible --- that is, whether participants can be
-convincingly misinformed about the stimuli to be delivered (this would, for exaple, allow placebo-conditioning studies to take place, e.g. @montgomery1997classical); and
+convincingly misinformed about the stimuli to be delivered (this would, for exaple, 
+allow placebo-conditioning studies to take place, e.g. [Montgomery1997]_; and
 the *expense* and *practicality* of the techniques — for example whether
 the equipment can be used by students without additional supervision.
 
@@ -158,7 +159,7 @@ On OS X (or BSD/Linux)
 .. _pip: https://pypi.python.org/pypi/pip
 
 
-  And then to install the software: ``pip install fab-controller``
+And then to install the software: ``pip install fab-controller``
 
 
 4. To start using the FAB device, type the command: ``fab``
@@ -290,7 +291,7 @@ Instructions for participants
 .. note:: In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that **if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards**.
 
 
-The probes in contact with the participants' fingers are attached using magnets to ensure it will always be possible with only very moderate horzontal force, and it is recommended to demonstrate this feature to participants at the very start of the session.
+The probes in contact with the participants' fingers are attached using magnets to ensure it will always be possible for them to remove their fingers with only very moderate horzontal force. It is recommended to demonstrate this feature to participants at the very start of the session.
 
 
 
@@ -307,13 +308,11 @@ The current log file name change be changed (e.g. per-participant) in the 'Detai
 
 
 
-Troubleshooting and known issues
----------------------------------------------------------
+.. Troubleshooting and known issues
+.. ---------------------------------------------------------
 
 
 
-Software hangs on start-up
-  The device must start in a position where neither piston is activating the top-stop micro-switch. If the switch is depressed on startup the server may hang. The workaround is to remove power from the device and pull both pistons gently downwards approx 3 mm.
 
 
 
