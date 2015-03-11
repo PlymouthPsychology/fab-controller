@@ -158,7 +158,7 @@ On OS X (or BSD/Linux)
 .. _pip: https://pypi.python.org/pypi/pip
 
 
-  And then to install the software: ``pip install fab-controller``
+And then to install the software: ``pip install fab-controller``
 
 
 4. To start using the FAB device, type the command: ``fab``
