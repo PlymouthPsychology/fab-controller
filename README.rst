@@ -290,7 +290,7 @@ Instructions for participants
 .. note:: In addition to standard reminders that participants are free to withdraw from experiments at any time, participants in studies using the FAB should be explictly reminded that **if they wish to stop the study at any time they should simply remove their hands from the device by pulling backwards**.
 
 
-The probes in contact with the participants' fingers are attached using magnets to ensure it will always be possible with only very moderate horzontal force, and it is recommended to demonstrate this feature to participants at the very start of the session.
+The probes in contact with the participants' fingers are attached using magnets to ensure it will always be possible for them to remove their fingers with only very moderate horzontal force. It is recommended to demonstrate this feature to participants at the very start of the session.
 
 
 
@@ -307,13 +307,11 @@ The current log file name change be changed (e.g. per-participant) in the 'Detai
 
 
 
-Troubleshooting and known issues
----------------------------------------------------------
+.. Troubleshooting and known issues
+.. ---------------------------------------------------------
 
 
 
-Software hangs on start-up
-  The device must start in a position where neither piston is activating the top-stop micro-switch. If the switch is depressed on startup the server may hang. The workaround is to remove power from the device and pull both pistons gently downwards approx 3 mm.
 
 
 
