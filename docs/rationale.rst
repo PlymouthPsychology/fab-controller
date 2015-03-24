@@ -18,7 +18,7 @@ variety of stimuli as laborotory analogues including electrical stimuli
 :cite:`wager2004placebo`, cold water (i.e. a cold pressor;
 :cite:`posner1985effects`), heat :cite:`petrovic2002placebo`, iontophorensis
 :cite:`montgomery1997classical`, lasers :cite:`bingel2006mechanisms`, and pressure
-:cite:`whalley2008consistency`.
+:cite:`nussbaum1998reliability`.
 
 Pain stimuli for laborotory studies can be evaluated on a number of
 dimensions: the *reliability* of the stimuli (in the sense the same stimuli
@@ -27,9 +27,7 @@ that it corresponds to real world pain experiences; *repeatability*, in
 the sense that multiple stimuli can be given in a single experiment;
 whether *deception* is possible --- that is, whether participants can be
 convincingly misinformed about the stimuli to be delivered (this would, for exaple, 
-allow placebo-conditioning studies to take place, e.g. :cite:`montgomery1997classical`; and
-the *expense* and *practicality* of the techniques — for example whether
-the equipment can be used by students without additional supervision.
+allow placebo-conditioning studies to take place, e.g. :cite:`montgomery1997classical`; and the *expense* and *practicality* of the techniques.
 
 ==================   ============   ==========    ============    ===========   ==========    =========   ===========
      Stimuli          Reliablity     Validity      Repeatable      Deception     Blinding      Expense     Practical 
@@ -51,10 +49,13 @@ practical, reliable and have reasonable ecological validity (see Table
 for a comparison of the different types of pain stimulator available).
 The FB device is used to apply pressure to the fingers via a lever :cite:`forgione1971strain`, see figure.  However, three important limitations of the original FB device are that 
 
-1. it is impossible to deceive pariticpants as to the true magnitude of the
+1. It is impossible to deceive pariticpants as to the true magnitude of the
 stimulus to be delivered, ruling out conditioning studies
-2. it is impossible to blind experimenters to the stimuli to be delivered (e.g. via computer control), and that 
-3. the reliability of pain measurements is limited by the resolution of pain self report scales.
+
+2. It is impossible to blind experimenters to the stimuli to be delivered (e.g. via computer control), and that 
+
+3. The reliability of pain measurements is limited by the resolution of pain self report scales.
+
 
 The FAB is designed to resolve all three of these limitations.
 
@@ -63,7 +64,7 @@ The FAB is designed to resolve all three of these limitations.
    :alt: An original Forgione Barber device.
    :width: 200 px
 
-   An original Forgione Barber device :cite:`forgione1971strain`.
+   A Forgione Barber device :cite:`forgione1971strain`.
 
 
 
