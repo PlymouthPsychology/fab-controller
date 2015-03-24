@@ -31,7 +31,10 @@ The FAB updates an original design to allow for indepenent computer control of p
    The hardware <hardware>
    Software installation <software>
    guide
+   ethics
    participant-instructions
+
+   references
 
 
 
