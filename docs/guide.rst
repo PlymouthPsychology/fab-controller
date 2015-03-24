@@ -21,6 +21,8 @@ the user interface for the FAB device, shown below.
    :alt: The FAB user interface
 
    The FAB user interface
+
+
 The device has 3 primary modes of use:
 
 -  Manual control
@@ -121,4 +123,5 @@ The current log file name change be changed (e.g. per-participant) in the 'Detai
 .. ( 19.6/ (.002*.01)  )/1000
 
 .. Could be between 816 and 1225 kpa depending on width of contact spot
+
 
