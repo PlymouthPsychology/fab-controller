@@ -11,6 +11,8 @@ Rationale for the new design
 
 
 
+.. https://www.researchgate.net/publication/7333799_Reliability_of_pain_threshold_measurement_in_young_adults
+.. variability low and reliablity high for algometry
 
 
 Studies of pain and placebo analgesia have historically used a wide
@@ -47,10 +49,10 @@ relatively closely related to the pressure applied, and many studies of
 pain and placebo analgesia use pressure stimuli because they are cheap,
 practical, reliable and have reasonable ecological validity (see Table
 for a comparison of the different types of pain stimulator available).
-The FB device is used to apply pressure to the fingers via a lever :cite:`forgione1971strain`, see figure.  However, three important limitations of the original FB device are that 
+The FB device is used to apply pressure to the fingers via a lever :cite:`forgione1971strain`, see figure.  However, three important limitations of the original FB device (and related devices such as pressure algometers or myometers, e.g. :cite:`edwards1996method`) are that 
 
 1. It is impossible to deceive pariticpants as to the true magnitude of the
-stimulus to be delivered, ruling out conditioning studies
+stimulus to be delivered, ruling out conditioning studies.
 
 2. It is impossible to blind experimenters to the stimuli to be delivered (e.g. via computer control), and that 
 
