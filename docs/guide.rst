@@ -37,11 +37,11 @@ Target weights and tracking
 In both manual and programmed control, the interface distinguishes
 between:
 
--  Target value for the weight[#grams]_  applied to each hand.
+-  Target value for the weight in grams to be applied to each hand.
 -  The actual measurements recorded by the sensor [#actualforce]_.
 
 
-.. [#actualforce] Note that the exact pressure applied to the finger will vary as a function of the contact area, and can only be estimated based on the width of the finger, but will be broadly similar between participants.
+.. [#actualforce] Note that the exact pressure applied to the finger will vary as a function of the probe size.
 
 
 Targets can be set in 'grams' for each hand[#grams]_. Once a target has been set
@@ -103,25 +103,10 @@ Get set, Stop and Reset buttons.
 
 
 
-
-
-
 Logging and data capture
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 By default, log files will be saved into ``~/Documents/fab/logs/``.
 
-The current log file name change be changed (e.g. per-participant) in the 'Detailed Log' tab, next to the console.
-
-
-
-
-
-
-.. Pressure = 980kpa
-.. 2kg in newtons / 2mm*10mm area  / 1000 = kpa
-.. ( 19.6/ (.002*.01)  )/1000
-
-.. Could be between 816 and 1225 kpa depending on width of contact spot
-
+The current log file name can be changed (e.g. per-participant) in the 'Detailed Log' tab, next to the console.
 

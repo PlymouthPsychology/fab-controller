@@ -1,4 +1,5 @@
 
+.. _participant-instructions:
 
 ******************************
 Instructions for participants 
