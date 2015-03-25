@@ -26,7 +26,7 @@ Arduino microcontroller and sensors
   to a controlling PC via the `Firmata <http://firmata.org/wiki/Main_Page>`_ serial protocol.
 
 
-.. [#grams]  Where 1 g = 9.8 mN
+.. [#grams]  Where 1kg = 9.8 mN
 
 
 .. figure:: _static/piston_300.jpg?raw=true
