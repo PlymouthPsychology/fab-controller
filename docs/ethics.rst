@@ -10,13 +10,17 @@ Ethical considerations
 Weight, force, pressure, and perceived stimulus intensity
 ============================================================
 
-Studies using the original FB device delivered painful pressure-stimuli to the fingers. This was achieved by lowering a 2kg [#nonstandard]_ weight (force = approx 19.6N) attached to a lucite knife 2mm wide, which made contact with an area of between 10 and 20mm\ :sup:`2` of the tested finger. 
+Studies using the original FB device delivered painful pressure-stimuli to the fingers. This was achieved by lowering a 2kg [#nonstandard]_ weight (force = approx 19.6N) attached to a lucite knife 0.5mm wide, which made contact with an area in the region of 5mm\ :sup:`2` of the tested finger. 
 
-Because the area in contact with the knife varied with width of the finger (and this varies by partipant) the peak pressure delivered could vary substantially between participants. We estimate that studies using the original FB device applied pressures in the range of 60kPa to 196kPa (kilopascals).
+Because the area in contact with the knife varied with width of the finger (and this varies by partipant) the peak pressure delivered could vary substantially between participants. We estimate that studies using the original FB device applied pressures in the range of 3.14MPa to 5.23MPa (megapascals). However, many Forgione Barber devices subsequently used in research have not conformed to the original specification, and in our experience most used a knife probe approximately 2mm in width, equating to a peak pressure of approximately 1.31MPa.
 
 The nature of the relationship between peak pressure, total force applied, perceived stimulus intensity, and pain is not fully understood. However we have found that, in use, participants with narrow fingers typically find FB stimuli substantially more painful than those with wider fingers. Furthermore, the large individual-differences typically observed in response to FB stimuli may be in part due to the shape of participants' finger bones; those with wider, flatter finger bones may experience less pain, purely as an artifact of the device design.
 
-The new device replaces the linear knife-probe with a circular probe, 5mm in diameter. This equates to an area of 19.6mm\ :sup:`2` and, holding the force applied constant, a peak pressure of 50kPA N/m\ :sup:`2`. Thus, the stimulus is at the lower end of the range delivered by the previous device, but ensures that all participants recieve the same peak force and pressure in all stimuli.
+Our new device replaces the linear knife-probe with a circular probe, 5mm in diameter. Holding the force applied constant, we anticipate a peak pressure of 1.25MPa. Thus, the stimulus is well below the pressures delivered by the FB device as originally specified, and also slightly lower than the peak force delivered by later machines which did not fully conform to the specification. However our new device ensures that all participants recieve the same peak force and pressure in all stimuli.
+
+.. note:: Calculations of pressure from knife size and assumed contact areas are available in this spreadsheet :download:`pressures.xslx`.
+
+
 
 .. e.g.
 .. 19.6/(((2*5)/1000)^2) 
