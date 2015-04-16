@@ -11,7 +11,7 @@ Getting started
 ^^^^^^^^^^^^^^^^^^
 
 1. Connect both the DC power input and the USB cables.
-2. Run the ``fab`` command from the Terminal.
+2. Run the ``fab`` command from the Terminal or Windows shell.
 
 
 On running the ``fab`` command, a browser window will open containing
@@ -28,6 +28,20 @@ The device has 3 primary modes of use:
 -  Manual control
 -  Programmed control
 -  Calibration mode
+
+
+`fab` command options
+-----------------------------
+
+..code ::
+  
+  --no-box        Allows the UI server to run without an FAB device connected, 
+                  for testing or demos.
+
+  -v --verbose    Displays more verbose messages.
+
+  --port          Which port the UI server should run on. Defaults to 2008
+
 
 
 
@@ -85,6 +99,20 @@ Denote a program which will deliver 500g to both hands for 20 seconds,
 and then 1000g to the left and 2000g to the right hands for 10 seconds.
 
 At the end of a program target weights are set to zero.
+
+
+
+Adding prompts to programs:
+
+In addition, programs can cause an audio prompt to play the word "left" or "right". 
+Simply add "left" or "right" as a 4th element to a line in a program:
+
+::
+    5, 500, 500, left
+    10, 500, 500, right
+
+
+Would play the words "left" and "right" at 5 and 10 seconds respectively.
 
 
 

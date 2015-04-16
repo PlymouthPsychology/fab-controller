@@ -18,6 +18,27 @@ import gevent
 from settings import *
 
 
+
+app = Flask(__name__, )
+app.config['debug'] = False
+socketio = SocketIO(app)
+app.blocks = deque()
+app.programme_countdown = None
+app.logfilename = "log.txt"  # a default
+app.logfilepath = LOGFILE_DIR
+
+@app.after_request
+def add_header(response):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to cache the rendered page for 10 minutes.
+    """
+    response.headers['X-UA-Compatible'] = 'IE=Edge,chrome=1'
+    response.headers['Cache-Control'] = 'public, max-age=0'
+    return response
+
+
+
 def get_arduino_name():
     """Tries to find an Arduino acting as a usb modem. If multiple
     candidates found asks user to select one."""
@@ -48,62 +69,68 @@ def get_board(tty):
     return board, it
 
 
-
-app = Flask(__name__, )
-app.config['debug'] = False
-socketio = SocketIO(app)
-app.blocks = deque()
-app.programme_countdown = None
-app.logfilename = "log.txt"  # a default
-
-# Acquire the Arduino board via serial usb
-print("Acquiring the arduino board and starting iterator...")
-board, boarditerator = get_board(get_arduino_name())
-
-
 # THIS IS IMPORTANT!!
 # If board.exit() not fired the board will need to be unplgged and 
 # plugged in again to work correctly.
-def signal_handler(signal, frame):
+def cleanup_board_signal_handler(signal, frame):
     print('You pressed Ctrl+C! Cleaning up...')
     board.exit()
     sys.exit(0)
 
-signal.signal(signal.SIGINT, signal_handler)
 
 
-# Build a dictionary of the pins on the actual board from our settings file.
-print("Setting up pins")
-live_pins = {
-    'left': {
-        'high_limit_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.left)),
-        'low_limit_pin': board.get_pin('d:{}:i'.format(LOW_LIMIT_PIN.left)),
-        'sensor_pin': board.get_pin('a:{}:i'.format(SENSOR_PIN.left)),
-        'step_pin': board.get_pin('d:{}:o'.format(STEP_PIN.left)),
-        'direction_pin': board.get_pin('d:{}:o'.format(DIRECTION_PIN.left)),
-    },
-    'right': {
-        'high_limit_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.right)),
-        'low_limit_pin': board.get_pin('d:{}:i'.format(LOW_LIMIT_PIN.right)),
-        'sensor_pin': board.get_pin('a:{}:i'.format(SENSOR_PIN.right)),
-        'step_pin': board.get_pin('d:{}:o'.format(STEP_PIN.right)),
-        'direction_pin': board.get_pin('d:{}:o'.format(DIRECTION_PIN.right)),
+
+def setup_pins(board):
+
+    # Build a dictionary of the pins on the actual board from our settings file.
+    print("Setting up pins")
+    live_pins = {
+        'left': {
+            'high_limit_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.left)),
+            'low_limit_pin': board.get_pin('d:{}:i'.format(LOW_LIMIT_PIN.left)),
+            'sensor_pin': board.get_pin('a:{}:i'.format(SENSOR_PIN.left)),
+            'step_pin': board.get_pin('d:{}:o'.format(STEP_PIN.left)),
+            'direction_pin': board.get_pin('d:{}:o'.format(DIRECTION_PIN.left)),
+        },
+        'right': {
+            'high_limit_pin': board.get_pin('d:{}:i'.format(HIGH_LIMIT_PIN.right)),
+            'low_limit_pin': board.get_pin('d:{}:i'.format(LOW_LIMIT_PIN.right)),
+            'sensor_pin': board.get_pin('a:{}:i'.format(SENSOR_PIN.right)),
+            'step_pin': board.get_pin('d:{}:o'.format(STEP_PIN.right)),
+            'direction_pin': board.get_pin('d:{}:o'.format(DIRECTION_PIN.right)),
+        }
     }
-}
 
-# Turn on reporting on the sensor pins. 
-live_pins['left']['sensor_pin'].enable_reporting()
-live_pins['right']['sensor_pin'].enable_reporting()
+    # Turn on reporting on the sensor pins. 
+    live_pins['left']['sensor_pin'].enable_reporting()
+    live_pins['right']['sensor_pin'].enable_reporting()
+
+    return live_pins
 
 
+
+def check_pins(live_pins):
+    # PIN SETUP
+    # This could be moved into the Crusher init function.
+    print("Checking switches and sensors are live...")
+    print live_pins
+    gevent.joinall([
+                gevent.spawn(check_pin, live_pins['left']['high_limit_pin'], live_pins, hand="left"),
+                gevent.spawn(check_pin, live_pins['right']['high_limit_pin'], live_pins, hand="right"),
+                gevent.spawn(check_pin, live_pins['left']['sensor_pin'], live_pins),
+                gevent.spawn(check_pin, live_pins['right']['sensor_pin'], live_pins),
+            ], 
+        timeout=15, 
+        raise_error=True
+    )
+
+    return True
 
 
 # this could be moved into the Crusher init function.
 print("Checking switches and sensors are live...")
 
-
-
-def check_pin(pin, hand=None):
+def check_pin(pin, live_pins, hand=None):
     # range for loop specifies max tries or steps down before giving up 
     for i in xrange(1000):
         if pin.read() is not None:
@@ -121,21 +148,14 @@ def check_pin(pin, hand=None):
     raise Exception("{} cannot be recognised".format(pin))
 
 
-# checking switches and sensors can be read
-gevent.joinall([
-            gevent.spawn(check_pin, live_pins['left']['high_limit_pin'], hand="left"),
-            gevent.spawn(check_pin, live_pins['right']['high_limit_pin'], hand="right"),
-            gevent.spawn(check_pin, live_pins['left']['sensor_pin']),
-            gevent.spawn(check_pin, live_pins['right']['sensor_pin']),
-        ], 
-    timeout=15, 
-    raise_error=True
-)
 
-
-# scale a value in range (a,b) to corresponding value in range (c,d)
-scale_range = lambda x, OldMin, OldMax, NewMin, NewMax: \
-    (((x - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+def scale_range(x, OldMin, OldMax, NewMin, NewMax):
+    """Scale a value in range (a,b) to corresponding value in range (c,d)"""    
+    try:
+        return (((x - OldMin) * (NewMax - NewMin)) / (OldMax - OldMin)) + NewMin
+    except ZeroDivisionError as e:
+        _log_session_data({'message': "Error ({}). Are you sure 2kg is applied?".format(e)})
+        raise 
 
 
 
@@ -147,7 +167,9 @@ class Crusher(object):
     steps_from_top = 3000  # note this may not be correct on switch on, but we will initialise by driving to top
     target = None
 
-    def __init__(self, zero, twokg, name="leftorright"):
+    def __init__(self, zero, twokg, live_pins, name="leftorright"):
+
+        self.live_pins = live_pins
 
         self.tracking = True
         self.target = 0  # target weight for this crusher in grams
@@ -167,7 +189,7 @@ class Crusher(object):
 
     def set_direction(self, direction):
         if self.direction != direction:
-            live_pins[self.name]['direction_pin'].write(direction)
+            self.live_pins[self.name]['direction_pin'].write(direction)
             self.direction = direction
 
     def _switch_state_generator(self, position):
@@ -176,9 +198,9 @@ class Crusher(object):
             """
 
             if position == "top":
-                pin = live_pins[self.name]['high_limit_pin']
+                pin = self.live_pins[self.name]['high_limit_pin']
             else:
-                pin = live_pins[self.name]['low_limit_pin']
+                pin = self.live_pins[self.name]['low_limit_pin']
 
             windowlen = SWITCH_CHECKING_WINDOW_LENGTH
             window = deque(maxlen=windowlen)
@@ -210,16 +232,17 @@ class Crusher(object):
 
     def go_to_top_and_init(self):
 
-        print("Moving down slightly")
+        _log_session_data({'message': "Moving down slightly"})
         self.set_direction(DOWN)
         gevent.sleep(.1)
         self.pulse(n=100)
 
-        print("Moving", self.name, "to top to initialise.")
+        
+        _log_session_data({ 'message': "Moving {} to top to initialise.".format(self.name)})
         self.go_to_top()
 
         self.steps_from_top = 0
-        print("\n", self.name, "is at top limit switch.")
+        _log_session_data({ 'message':  "{} is at top limit switch.".format(self.name)})
 
         self.set_direction(DOWN)
         gevent.sleep(.1)
@@ -227,7 +250,7 @@ class Crusher(object):
             self.pulse()
             gevent.sleep(.0001)
 
-        print("\n", self.name, "is ready")
+        _log_session_data({ 'message':  "{} is ready.".format(self.name)})
 
     def pulse(self, n=1):
         """Pulse the stepper motor if safe to do so. Return error code or
@@ -255,7 +278,7 @@ class Crusher(object):
                 return AT_TOP
 
         # do the stepping
-        p = live_pins[self.name]['step_pin']
+        p = self.live_pins[self.name]['step_pin']
         for i in range(n):
             p.write(1)
             gevent.sleep(STEP_DELAY)
@@ -272,12 +295,12 @@ class Crusher(object):
 
     def analog_reading(self):
         """Not actually volts - just the input from the analog input"""
-        return live_pins[self.name]['sensor_pin'].read()
+        return self.live_pins[self.name]['sensor_pin'].read()
 
     def zero_sensor(self):
         self.zero = self.analog_reading()
         msg = "Setting zero point for {} to analog reading: {}".format(self.name, self.zero)
-        print(msg)
+        _log_session_data({'message': msg})
 
     def grams(self):
         """Scale using parameters in settings. Note parameters for each hand/sensor may differ."""
@@ -321,40 +344,47 @@ def static_proxy(path):
 @socketio.on('set_manual')
 def set_manual(forces):
     l, r = (forces['left'], forces['right'])
-    app.left.target = l
-    app.right.target = r
-    _log_session_data({'targets': Pair(l, r)})
+    try:
+        app.left.target = l
+        app.right.target = r
+        _log_session_data({'targets': Pair(l, r)})
+
+    except AttributeError as e:
+        _log_session_data({'message': "Can't set target:{}".format(e)})
+
 
 
 @socketio.on('new_program')
 def run_program_from_json(jsondata):
     prog = validate_json_program(jsondata)
     if prog:
-        _log_session_data({'programme': prog})
+        _log_session_data({'programme': prog, "message": "Running program."},)
         schedule_program_for_execution(prog)
 
 @socketio.on('set_logfile_name')
 def set_logfile_name(data):
     app.logfilename = data.get("logfilename", "log.txt")
-    print("Updated logfilename to ", app.logfilename)
+    _log_session_data({'message': "Updated logfilename to {}".format(app.logfilename)})
 
 
 def _log_session_data(data):
     """Write a dictionary as a string to a line in the logfile."""
+
     if not isinstance(data, dict):
         data = {'message': data}
+
+    if data.get('message', None):
+        socketio.emit('actionlog', data.get('message'))
 
     data.update({'timestamp': datetime.now()})
     with open(os.path.join(LOGFILE_DIR, app.logfilename), "a") as f:
         f.write(str(data) + "\n")
-    if data.get('message', None):
-        socketio.emit('log', data)
-    else:
-        pass
+    
 
 @socketio.on('log_session_data')
 def log_session_data(data):
     """Socket handler to write to log from client."""
+
     return _log_session_data(data)
 
 
@@ -369,9 +399,13 @@ def quit(data):
 @socketio.on('restonfingers')
 def restonfingers(x):
     """Apply just 20g to give a consistent starting point for pre-programmed sessions."""
-    app.left.target = 50
-    app.right.target = 50
-    _log_session_data({'message': "Resting on fingers"})
+    try:
+        app.left.target = 50
+        app.right.target = 50
+        _log_session_data({'message': "Rest on fingers"})
+
+    except AttributeError as e:
+        _log_session_data({'message': "Error resting on fingers: " + str(e)})
 
 @socketio.on('toggle_tracking')
 def toggle_tracking(x):
@@ -422,11 +456,14 @@ def return_to_stops(data):
     _log_session_data({'message': "Returning pistons to top stops."})
     stopall()
 
-    # we join these functions so they happen simultaneously
-    gevent.joinall([
-        gevent.spawn(app.left.go_to_top),
-        gevent.spawn(app.right.go_to_top),
-    ])
+    try:
+        # we join these functions so they happen simultaneously
+        gevent.joinall([
+            gevent.spawn(app.left.go_to_top),
+            gevent.spawn(app.right.go_to_top),
+        ])
+    except AttributeError as e:
+        _log_session_data({'message': str(e)})
 
 @socketio.on('lift_slightly')
 def lift_slightly(x):
@@ -441,6 +478,11 @@ def lift_slightly(x):
         gevent.spawn(app.right.pulse, 300)
     ])
     
+
+
+@socketio.on('disconnect',)
+def test_disconnect():
+    print('Client disconnected')
 
 
 # Helper functions
@@ -458,9 +500,23 @@ def build_log_entry(app):
         'steps_from_top_L': app.left.steps_from_top,
         'steps_from_top_R': app.right.steps_from_top,
         'logfile': app.logfilename,
+        'logfilepath': app.logfilepath,
         'version': FAB_VERSION,
     }
 
+
+def get_list_item_or_none(l, i):
+    try:
+        return l[i]
+    except IndexError:
+        return None
+
+def int_or_prompt(s):
+    try: 
+        return int(s)
+    except:
+        assert s.strip() in ["left", "right"]
+        return s.strip()
 
 def validate_json_program(jsondata):
 
@@ -468,14 +524,15 @@ def validate_json_program(jsondata):
         lines = [x for x in jsondata['data'].splitlines() if x.strip()]  # strip whitespace
         lines = [x for x in lines if x[0] is not "#"]  # remove comments
         lines = [re.split('\W+|[,]', i) for i in lines]  # split duration, left, right
-        prog_ints = [list(map(int, i)) for i in lines]  # we need integers
-        return [Block(x[0], Pair(x[1], x[2])) for x in prog_ints]  # return blocks
+        prog_ints = [list(map(int_or_prompt, i)) for i in lines]  # we need integers
+        socketio.emit('actionlog', "Program validated" )
+        return [Block(x[0], Pair(x[1], x[2]), get_list_item_or_none(x,3)) for x in prog_ints]  # return blocks
 
     except Exception as e:
-        msg = "Program error: " + str(e)
-        print(msg)
-        emit('actionlog', msg, broadcast=True)
+        msg = "Program error: {}".format(e)
+        socketio.emit('actionlog', msg )
         return False
+
 
 
 def schedule_program_for_execution(prog):
@@ -483,34 +540,51 @@ def schedule_program_for_execution(prog):
     stopall()  # clear everything already in the queue
     prog = deque(prog)  # because we want to popleft on this
 
+    _log_session_data({"Program": prog, "message": "Scheduling" })
+
     def add_blocks_keeping_running_time(programme, blocks, cumtime):
         """Recursive function to spawn a list of future blocks from a user program.
 
         Return tuple of the blocks and the total running time of the programme.
         """
         if not programme:
+            # we've come to the end of the programme, so set last block with weight=0 and return.
             print("finished building blocks from prog")
             blocks.append(gevent.spawn_later(cumtime, set_block_targets, Pair(0, 0)))
             blocks.append(gevent.spawn_later(cumtime, _log_session_data, *({'message': "Program complete"})))
             return (blocks, cumtime)
+        
         else:
+            # take the next block and adjust the weight
             block = programme.popleft()
             blocks.append(gevent.spawn_later(cumtime, set_block_targets, *(block.grams, )))
+            
+            # also send a prompt if needed
+            if block.prompt:
+                blocks.append(gevent.spawn_later(cumtime, send_prompt, *(block.prompt, )))
+            
             return add_blocks_keeping_running_time(programme, blocks, cumtime + block.duration)
 
     app.blocks, app.programme_countdown = add_blocks_keeping_running_time(prog, deque(), 0)
     print(app.blocks, app.programme_countdown)
 
 
+def send_prompt(hand):
+    socketio.emit('sayprompt', { "hand": hand} )
+    _log_session_data({"prompt": hand, "message": "Sending prompt: {}".format(hand)})
+
 def set_block_targets(grams):
     """Set target forces."""
+    try:
+        app.left.target, app.right.target = grams  # note tuple unpacking here
+    except AttributeError as e:
+        print e
 
-    app.left.target, app.right.target = grams  # note tuple unpacking here
-    _log_session_data({"Setting targets": grams})
+    _log_session_data({"target": grams, "message": "Setting target: {}".format(grams)})
 
 
 
-# THESE LOOPING FUNCTIONS JOINED TOGETHER BY GEVENT FOR CONCURRENCY
+# THESE LOOPING FUNCTIONS ARE JOINED TOGETHER BY GEVENT FOR CONCURRENCY
 
 def programme_countdown():
     while True:
@@ -524,23 +598,37 @@ def programme_countdown():
         gevent.sleep(1)
 
 def update_dash():
+    """Updates the dashboard."""
     while 1:
         jsondata = json.dumps(build_log_entry(app))
         socketio.emit('update_dash', {'data': jsondata})
         gevent.sleep(DASHBOARD_UPDATE_INTERVAL)
 
+
 def tight():
+    """Our tight loop which runs to update the pressures."""
     while 1:
         app.left.track()
         app.right.track()
         gevent.sleep(TIGHT_LOOP_INTERVAL)
 
-def open_interface():
-    print("Opening user interface in browser window")
-    c = webbrowser.get('safari')
-    c.open("127.0.0.1:{}".format(SERVER_PORT), new=0, autoraise=True)
-    
 
+def open_interface(port):
+    print("Opening user interface in browser window")
+    try:
+        if sys.platform.startswith('win'):
+            c = webbrowser.get('windows-default')
+        elif sys.platform.startswith('darwin'):
+            c = webbrowser.get('safari')
+        else:
+            c = webbrowser.get('firefox')
+        
+        c.open("127.0.0.1:{}".format(port), new=0, autoraise=True)
+
+    except:
+        print("Couldn't open a web browser. Please open http://127.0.0.1:{} in a web browser".format(SERVER_PORT))
+    
+    
 def log_sensors():
     while 1:
         if app.left.target > 0 or app.right.target > 0:
@@ -550,33 +638,3 @@ def log_sensors():
             })
 
         gevent.sleep(LOG_INTERVAL)
-
-
-if __name__ == "__main__":
-
-    # test the left machine
-    print("Starting crusher instances:")
-
-    app.left = Crusher(
-        live_pins['left']['sensor_pin'].read(),  # this sets the initial zero value to the current reading
-        TWO_KG.left,
-        "left"
-    )
-    app.right = Crusher(
-        live_pins['right']['sensor_pin'].read(),
-        TWO_KG.right,
-        "right"
-    )
-    
-    gevent.joinall([
-        socketio.run(app, host="0.0.0.0", port=SERVER_PORT),
-        gevent.spawn(open_interface),
-        gevent.spawn(update_dash),
-        gevent.spawn(app.left.go_to_top_and_init),
-        gevent.spawn(app.right.go_to_top_and_init),
-        gevent.spawn(tight),
-        gevent.spawn(log_sensors),
-        
-        gevent.spawn(programme_countdown),
-        
-    ])

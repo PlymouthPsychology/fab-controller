@@ -8,13 +8,13 @@ FAB_VERSION = pkg_resources.require("fab_controller")[0].version
 
 HANDS = ['left', 'right']  # We have two hands
 Pair = namedtuple('Pair', HANDS)  # structure used to store values on each hand
-Block = namedtuple('Block', ['duration', 'grams'])  # grams should itself be a Pair
+Block = namedtuple('Block', ['duration', 'grams', 'prompt'],)  # grams should itself be a Pair
 
 
 # FOR TWEAKING
 
 LOG_INTERVAL = .5
-LOGFILE_DIR = os.path.expanduser("~/Documents/fab/logs/")
+LOGFILE_DIR = os.path.expanduser("~/FAB/logs/")
 
 REST_N_FROM_TOP = 500
 
@@ -28,7 +28,7 @@ TIGHT_LOOP_INTERVAL = .001  # delay after running each iteration of the tracking
 ALLOWABLE_DISCREPANCY = 20  # delta between sensor reading and target which triggers a movement
 TWO_KG = Pair(0.4457, 0.4692)  # sensor readings at 2kg load - these need to be measured!!!
 DASHBOARD_UPDATE_INTERVAL = .2
-SERVER_PORT = 8000 #random.choice(range(2000, 10000))
+SERVER_PORT = 2008 #random.choice(range(2000, 10000))
 
 
 # PROBABLY BEST LEFT

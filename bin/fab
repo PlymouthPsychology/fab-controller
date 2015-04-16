@@ -1,32 +1,76 @@
 #!/usr/bin/env python
 
-from fab_controller.FAB import *
 import os
+import click
+from flask import Flask
+from flask_socketio import SocketIO, send, emit
+from fab_controller.FAB import *
 
 
-if __name__ == "__main__":
 
+
+@click.command()
+@click.option('--port', default=8000, help='Which port should the web based UI run on?')
+@click.option('--verbose', 'verbose', flag_value=True, default=False)
+@click.option('--no-box', 'box', flag_value=False, default=True)
+def fab(verbose, box, port):
+
+    # override some defaults
+    SERVER_PORT = port or SERVER_PORT
+    VERBOSE = verbose or False
+
+    def log(message):
+        if VERBOSE:
+            print message
+
+
+    # ARDUINO BOARD SETUP
+    if box:
+        # Acquire the Arduino board via serial usb
+        log("Acquiring the arduino board and starting iterator...")
+        board, boarditerator = get_board(get_arduino_name())
+        signal.signal(signal.SIGINT, cleanup_board_signal_handler)
+
+        live_pins = setup_pins(board)
+        pins_checked = check_pins(live_pins)
+        
+
+        app.left = Crusher(
+            live_pins['left']['sensor_pin'].read(),  # this sets the initial zero value to the current reading
+            TWO_KG.left,
+            live_pins,
+            "left"
+        )
+        app.right = Crusher(
+            live_pins['right']['sensor_pin'].read(),
+            TWO_KG.right,
+            live_pins,
+            "right"
+        )
+
+    
+    # LOGGING
     if not os.path.exists(LOGFILE_DIR):
         os.makedirs(LOGFILE_DIR)
 
-    app.left = Crusher(
-        live_pins['left']['sensor_pin'].read(),  # this sets the initial zero value to the current reading
-        TWO_KG.left,
-        "left"
-    )
-    app.right = Crusher(
-        live_pins['right']['sensor_pin'].read(),
-        TWO_KG.right,
-        "right"
-    )
-    
+        log("Logging data to {}".format(LOGFILE_DIR))
+
+
+    log("Starting server")
+    # we say "box and ..." to only start some parts of the server if we have a box attached
     gevent.joinall([
-        gevent.spawn(app.left.go_to_top_and_init),
-        gevent.spawn(app.right.go_to_top_and_init),
-        gevent.spawn(open_interface),
-        gevent.spawn(tight),
-        gevent.spawn(log_sensors),
-        gevent.spawn(update_dash),
+        box and gevent.spawn(app.left.go_to_top_and_init),
+        box and gevent.spawn(app.right.go_to_top_and_init),
+        gevent.spawn(open_interface, port=SERVER_PORT),
+        box and gevent.spawn(tight),
+        box and gevent.spawn(log_sensors),
+        box and gevent.spawn(update_dash),
         gevent.spawn(programme_countdown),
         socketio.run(app, host="0.0.0.0", port=SERVER_PORT)
     ])
+
+
+
+
+if __name__ == '__main__':
+    fab()
