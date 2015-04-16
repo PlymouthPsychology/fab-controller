@@ -4,3 +4,4 @@ Flask-SocketIO==0.3.8
 pyFirmata==1.0.2
 pyserial==2.7
 clint==0.4.1
+click==4.0
