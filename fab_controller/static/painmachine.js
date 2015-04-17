@@ -6,6 +6,9 @@ window.onbeforeunload = function() {
 
 $(document).ready(function() {
 
+    var listener = new window.keypress.Listener();
+
+
     // SETUP A TIMER
     var loadedtime = new Date() / 1000;
     timenow = function(){
@@ -240,19 +243,73 @@ $(document).ready(function() {
     });
 
 
-    // make sure we return to the correct tab on refresh
-    if (location.hash !== '') $('a[href="' + location.hash + '"]').tab('show');
-        return $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-        return location.hash = $(e.target).attr('href').substr(1);
-    });
+
+    // set up the pain score buttons and keyboard shortcuts
+    $(".painscorebutton").each(function(){
+        var thing = $(this)
+        var combo = thing.data('hand') + " " + thing.data('painscore');
+        var message = "Recorded pain score, {0}, {1}".f(thing.data('hand'), thing.html());
+
+        function doit(){
+            alertify.success(message);
+            socket.emit('log_session_data', {'message': message});
+        }
+        
+        thing.click(function(){
+            doit()
+        });
+
+        listener.sequence_combo(combo, function() {
+            doit()
+        }, true);
+    })
 
 
+    listener.sequence_combo("a n d r e w", function() {
+        alert("...is a dude!!!")
+    }, true);
+
+
+
+    // Save programs between sessions
+
+    DEFAULT_PROG = "# example program\n2,50,50\n2,500,500,left\n5,650,550,right\n5,750,500\n10,100,100";
+
+    $('#prog1').val($.jStorage.get('fab_prog1', DEFAULT_PROG));
+    $('#prog2').val($.jStorage.get('fab_prog2', DEFAULT_PROG));
+    $('#prog3').val($.jStorage.get('fab_prog3', DEFAULT_PROG));
+    $('#prog4').val($.jStorage.get('fab_prog4', DEFAULT_PROG));
+    $('#prog5').val($.jStorage.get('fab_prog5', DEFAULT_PROG));
+
+        
+    function saveProgram(){
+        $.jStorage.set("fab_" + $(this).attr('id'), $(this).val());
+    };
+
+    $(".prog").keyup(saveProgram);
 
     socket.emit('setup complete'); 
+
+
+}); 
+
+
+// make sure we return to the correct tab on refresh
+// http://stackoverflow.com/questions/9685968/best-way-to-make-twitter-bootstrap-tabs-persistent
+
+$(document).ready(function() {
+    // show active tab on reload
+    if (location.hash !== '') $('a[href="' + location.hash + '"]').tab('show');
+
+    // remember the hash in the URL without jumping
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+       if(history.pushState) {
+            history.pushState(null, null, '#'+$(e.target).attr('href').substr(1));
+       } else {
+            location.hash = '#'+$(e.target).attr('href').substr(1);
+       }
+    });
 });
-
-
-
 
 
 

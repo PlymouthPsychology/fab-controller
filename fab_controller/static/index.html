@@ -5,9 +5,16 @@
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="jquery-ui.css">
     <link href="styles.css" rel="stylesheet">
+
+    <script type="text/javascript" src="json2.js"></script>
+    <script type="text/javascript" src="keypress-2.1.0.min.js"></script>
     
     <script src="jquery.min.js"></script>
     <script src="jquery-ui.js"></script>
+    <script type="text/javascript" src="alertify.min.js"></script>
+    <link rel="stylesheet" href="alertify.core.css" />
+    <link rel="stylesheet" href="alertify.bootstrap.css" />
+
     <script type="text/javascript" src="socket.js"></script>
     <script type="text/javascript" src="knockout-3.1.0.js"></script>
     <script type="text/javascript" src="knockout.mapping-latest.js"></script>
@@ -17,8 +24,11 @@
     <script type="application/ecmascript" async="" src="FileSaver.js"></script>
     <script src="ucsv-1.2.0.min.js"></script>
     <script type="text/javascript" src="mousehold.js"></script>
+    <script type="text/javascript" src="jstorage.js"></script>
     <script type="text/javascript" src="painmachine.js"></script>
     <script type="text/javascript" src="utils.js"></script>
+
+    
 
 </head>
 
@@ -115,9 +125,15 @@
                 <div class="tab-pane active  fade in" id="programtab">
                     <div class="col-md-2">
                         <hr>
-                            <button id="programstopbutton" class="stopbutton btn btn-block btn-danger"  href="#">Stop</button>
-                            <button id="getsetbutton" class="btn btn-block btn-warning" href="#">Get Set</button>
                             <button id="return_to_stops_button"  class="btn btn-block btn-default"  href="#">Reset</button>
+
+                            <button id="getsetbutton" class="btn btn-block btn-warning" href="#">Get Set</button>
+                            
+
+                            <button id="runbutton" class="btn btn-block btn-success" data-bind="enable: remaining() === null">Run</button>
+
+                            <button id="programstopbutton" class="stopbutton btn btn-block btn-danger"  href="#">Stop</button>
+                            
                     </div>  
 
                     <div class="col-md-4">
@@ -140,11 +156,6 @@
 
                                 <h4 class="">Program 1</h4>
                                 <textarea id="prog1" class="prog"  data-bind="enable: remaining() === null" class="textarea" cols=100 rows=10>
-2,50,50
-2,500,500,left
-5,650,550,right
-5,750,500
-10,100,100
                                 </textarea>
                         </div>
 
@@ -160,7 +171,7 @@
 
                         <div class="tab-pane fade in" id="p4">
                             <h4 class="">Program 4</h4>
-                            <textarea id="prog3" class="prog"  data-bind="enable: remaining() === null" class="textarea" cols=100 rows=10></textarea>
+                            <textarea id="prog4" class="prog"  data-bind="enable: remaining() === null" class="textarea" cols=100 rows=10></textarea>
                         </div>
 
                         <div class="tab-pane fade in" id="p5">
@@ -169,7 +180,7 @@
                         </div>
                     </div>
                     
-                    <button id="runbutton" class="btn btn-block btn-success" data-bind="enable: remaining() === null">Run</button>
+                    
                     
                     <a href="#" class="btn btn-defalt pull-right" data-toggle="modal" data-target="#myModal">Help</a>
 
@@ -203,22 +214,22 @@
                     <h5 class="">Pain measurements</h5>
                         <span class="btn-group">L </span>
 
-                        <div class="btn-group btn-group-sm" hand="left">
-                            <button class="painscorebutton btn btn-sm btn-default">1</button>
-                            <button class="painscorebutton btn btn-sm btn-default">2</button>
-                            <button class="painscorebutton btn btn-sm btn-default">3</button>
-                            <button class="painscorebutton btn btn-sm btn-default">4</button>
-                            <button class="painscorebutton btn btn-sm btn-default">5</button>
-                            <button class="painscorebutton btn btn-sm btn-default">6</button>
-                            <button class="painscorebutton btn btn-sm btn-default">7</button>
-                            <button class="painscorebutton btn btn-sm btn-default">8</button>
-                            <button class="painscorebutton btn btn-sm btn-default">9</button>
-                            <button class="painscorebutton btn btn-sm btn-default">10</button>
+                        <div class="btn-group btn-group-sm">
+                            <button data-hand="l" data-painscore="0" class="painscorebutton btn btn-sm btn-default">0</button>
+                            <button data-hand="l" data-painscore="1"  class="painscorebutton btn btn-sm btn-default">1</button >
+                            <button data-hand="l" data-painscore="2"  class="painscorebutton btn btn-sm btn-default">2</button>
+                            <button data-hand="l" data-painscore="3"  class="painscorebutton btn btn-sm btn-default">3</button>
+                            <button data-hand="l" data-painscore="4"  class="painscorebutton btn btn-sm btn-default">4</button>
+                            <button data-hand="l" data-painscore="5"  class="painscorebutton btn btn-sm btn-default">5</button>
+                            <button data-hand="l" data-painscore="6"  class="painscorebutton btn btn-sm btn-default">6</button>
+                            <button data-hand="l" data-painscore="7"  class="painscorebutton btn btn-sm btn-default">7</button>
+                            <button data-hand="l" data-painscore="8"  class="painscorebutton btn btn-sm btn-default">8</button>
+                            <button data-hand="l" data-painscore="9"  class="painscorebutton btn btn-sm btn-default">9</button>
                         </div>
 
-                        <div class="btn-group" hand="left">
-                        <button class="painscorebutton btn btn-xs btn-warning btn-default">Thr</button>
-                        <button class="painscorebutton btn btn-xs btn-danger btn-default">Tol</button>
+                        <div class="btn-group">
+                        <button data-hand="l" data-painscore="t h" class="painscorebutton btn btn-xs btn-warning btn-default">Th</button>
+                        <button data-hand="l" data-painscore="t o" class="painscorebutton btn btn-xs btn-danger btn-default">To</button>
                         </div>
 
                         <p>&nbsp;</p>
@@ -226,23 +237,40 @@
 
                         <span class="btn-group">R </span>
 
-                        <div class="btn-group btn-group-sm" hand="right">
-                            <button class="painscorebutton btn btn-sm btn-default">1</button>
-                            <button class="painscorebutton btn btn-sm btn-default">2</button>
-                            <button class="painscorebutton btn btn-sm btn-default">3</button>
-                            <button class="painscorebutton btn btn-sm btn-default">4</button>
-                            <button class="painscorebutton btn btn-sm btn-default">5</button>
-                            <button class="painscorebutton btn btn-sm btn-default">6</button>
-                            <button class="painscorebutton btn btn-sm btn-default">7</button>
-                            <button class="painscorebutton btn btn-sm btn-default">8</button>
-                            <button class="painscorebutton btn btn-sm btn-default">9</button>
-                            <button class="painscorebutton btn btn-sm btn-default">10</button>
+                        <div class="btn-group btn-group-sm">
+                            <button data-hand="r" data-painscore="0" class="painscorebutton btn btn-sm btn-default">0</button>
+                            <button data-hand="r" data-painscore="1"  class="painscorebutton btn btn-sm btn-default">1</button>
+                            <button data-hand="r" data-painscore="2" class="painscorebutton btn btn-sm btn-default">2</button>
+                            <button data-hand="r" data-painscore="3" class="painscorebutton btn btn-sm btn-default">3</button>
+                            <button data-hand="r" data-painscore="4" class="painscorebutton btn btn-sm btn-default">4</button>
+                            <button data-hand="r" data-painscore="5" class="painscorebutton btn btn-sm btn-default">5</button>
+                            <button data-hand="r" data-painscore="6" class="painscorebutton btn btn-sm btn-default">6</button>
+                            <button data-hand="r" data-painscore="7" class="painscorebutton btn btn-sm btn-default">7</button>
+                            <button data-hand="r" data-painscore="8" class="painscorebutton btn btn-sm btn-default">8</button>
+                            <button data-hand="r" data-painscore="9" class="painscorebutton btn btn-sm btn-default">9</button>
+                            
                         </div>
 
-                        <div class="btn-group" hand="right">
-                        <button class="painscorebutton btn btn-xs btn-warning btn-default">Thr</button>
-                        <button class="painscorebutton btn btn-xs btn-danger btn-default">Tol</button>
+                        <div class="btn-group">
+                        <button data-hand="r" data-painscore="t h" class="painscorebutton btn btn-xs btn-warning btn-default">Th</button>
+                        <button data-hand="r" data-painscore="t o" class="painscorebutton btn btn-xs btn-danger btn-default">To</button>
                         </div>
+
+
+                        <div class="vspace3">&nbsp;</div>
+                        <div class="sm">
+                        <p>
+                            Pain measurements can also be recorded with the keyboard. Simply type <code>l</code> or <code>r</code> 
+                            followed by a number between 0 and 9. To record tolerance, type <code>t</code>and then <code>o</code>. 
+                            For Threshold type <code>t</code> and then <code>h</code>. Examples:
+                        </p>
+                                <ul>
+                                    <li><code>l3</code> records a score of 3 on the left hand</li>
+                                    <li><code>r6</code> records a score of 6 on the right hand</li>
+                                    <li><code>lth</code> records pain threshold reached for the left hand</li>
+                                </ul>
+                        </div>
+
                     </div>
 
             </div>  <!-- end prog tab -->
