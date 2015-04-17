@@ -522,8 +522,10 @@ def validate_json_program(jsondata):
 
     try:
         lines = [x for x in jsondata['data'].splitlines() if x.strip()]  # strip whitespace
+        lines = filter(lambda x: not x.strip().startswith("#"), lines) # get rid of comments
         lines = [x for x in lines if x[0] is not "#"]  # remove comments
         lines = [re.split('\W+|[,]', i) for i in lines]  # split duration, left, right
+
         prog_ints = [list(map(int_or_prompt, i)) for i in lines]  # we need integers
         socketio.emit('actionlog', "Program validated" )
         return [Block(x[0], Pair(x[1], x[2]), get_list_item_or_none(x,3)) for x in prog_ints]  # return blocks
